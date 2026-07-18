@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useCallback } from "react";
 import Image from "next/image";
 import { motion, AnimatePresence } from "framer-motion";
 import SectionTitle from "@/components/SectionTitle";
@@ -23,13 +23,16 @@ export default function GaleriePage() {
   const filtered =
     filter === "Tous" ? photos : photos.filter((p) => p.theme === filter);
 
-  const openLightbox = (index: number) => setLightbox(index);
-  const closeLightbox = () => setLightbox(null);
+  const openLightbox = useCallback((index: number) => setLightbox(index), []);
+  const closeLightbox = useCallback(() => setLightbox(null), []);
 
-  const navigate = (dir: number) => {
-    if (lightbox === null) return;
-    setLightbox((lightbox + dir + filtered.length) % filtered.length);
-  };
+  const navigate = useCallback(
+    (dir: number) => {
+      if (lightbox === null) return;
+      setLightbox((lightbox + dir + filtered.length) % filtered.length);
+    },
+    [lightbox, filtered.length]
+  );
 
   return (
     <div className="py-12 lg:py-20">
@@ -61,29 +64,24 @@ export default function GaleriePage() {
           {filtered.length} photo{filtered.length > 1 ? "s" : ""}
         </p>
 
-        {/* Grille masonry-like */}
-        <div className="columns-2 sm:columns-3 lg:columns-4 gap-3 space-y-3">
-          {filtered.map((photo, index) => (
+        {/* Grille */}
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3">
+          {filtered.map((photo) => (
             <motion.button
               key={photo.id}
-              layout
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
               transition={{ duration: 0.3 }}
-              onClick={() => openLightbox(index)}
-              className="group break-inside-avoid focus:outline-none focus:ring-2 focus:ring-marine rounded-xl overflow-hidden"
+              onClick={() => openLightbox(photo.id)}
+              className="group relative aspect-square focus:outline-none focus:ring-2 focus:ring-marine rounded-xl overflow-hidden bg-border-light"
             >
-              <div className="relative w-full aspect-square bg-border-light">
-                <Image
-                  src={photo.src}
-                  alt={photo.alt}
-                  fill
-                  className="object-cover transition-transform duration-500 group-hover:scale-110"
-                  sizes="(max-width: 768px) 50vw, (max-width: 1200px) 33vw, 25vw"
-                />
-                <div className="absolute inset-0 bg-marine/0 transition-colors group-hover:bg-marine/20" />
-              </div>
+              <img
+                src={photo.src}
+                alt={photo.alt}
+                loading="lazy"
+                className="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+              />
+              <div className="absolute inset-0 bg-marine/0 transition-colors group-hover:bg-marine/20" />
             </motion.button>
           ))}
         </div>
@@ -117,15 +115,13 @@ export default function GaleriePage() {
             </button>
 
             <div
-              className="relative max-w-5xl max-h-[85vh] w-full aspect-square"
+              className="relative max-w-5xl max-h-[85vh] w-full"
               onClick={(e) => e.stopPropagation()}
             >
-              <Image
+              <img
                 src={filtered[lightbox].src}
                 alt={filtered[lightbox].alt}
-                fill
-                className="object-contain rounded-lg"
-                sizes="100vw"
+                className="max-h-[85vh] w-full object-contain rounded-lg"
               />
             </div>
 
