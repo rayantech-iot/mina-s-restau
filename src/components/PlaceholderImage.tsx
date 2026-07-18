@@ -4,29 +4,23 @@ interface PlaceholderImageProps {
   alt: string;
   className?: string;
   size?: "sm" | "md" | "lg" | "xl";
+  src?: string;
 }
-
-const sizeMap = {
-  sm: { w: 200, h: 200 },
-  md: { w: 400, h: 400 },
-  lg: { w: 600, h: 600 },
-  xl: { w: 800, h: 600 },
-};
 
 export default function PlaceholderImage({
   alt,
   className = "",
   size = "md",
+  src,
 }: PlaceholderImageProps) {
-  const { w, h } = sizeMap[size];
+  const imageSrc = src || "/images/placeholder-plat.svg";
 
   return (
     <div
-      className={`relative overflow-hidden bg-border-light flex items-center justify-center ${className}`}
-      style={{ width: "100%", aspectRatio: `${w}/${h}` }}
+      className={`relative overflow-hidden bg-border-light ${className}`}
     >
       <Image
-        src="/images/placeholder-plat.svg"
+        src={imageSrc}
         alt={alt}
         fill
         className="object-cover"

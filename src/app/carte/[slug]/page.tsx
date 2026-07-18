@@ -1,8 +1,9 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import Image from "next/image";
 import { ArrowLeft } from "lucide-react";
-import PlaceholderImage from "@/components/PlaceholderImage";
 import FadeIn from "@/components/FadeIn";
+import { getPlatImage } from "@/lib/images";
 
 export const metadata: Metadata = {
   title: "Fiche plat",
@@ -24,11 +25,13 @@ export default function PlatDetailPage() {
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12">
           <FadeIn>
-            <div className="rounded-3xl overflow-hidden shadow-xl">
-              <PlaceholderImage
+            <div className="rounded-3xl overflow-hidden shadow-xl aspect-square relative">
+              <Image
+                src={getPlatImage(0)}
                 alt="Photo du plat"
-                size="lg"
-                className="w-full"
+                fill
+                className="object-cover"
+                sizes="(max-width: 1024px) 100vw, 50vw"
               />
             </div>
           </FadeIn>
@@ -38,17 +41,20 @@ export default function PlatDetailPage() {
               <span className="text-sm font-medium text-dore uppercase tracking-wider">
                 Poulets rôtis à la broche
               </span>
-              <h1 className="mt-2 font-serif text-3xl font-bold text-creme sm:text-4xl lg:text-5xl">
-                Plat en cours de chargement
+              <h1 className="mt-2 font-serif text-3xl font-bold text-marine sm:text-4xl lg:text-5xl">
+                Poulet rôti à la broche
               </h1>
-              <p className="mt-4 text-creme/70 leading-relaxed">
-                Ce plat sera disponible une fois la connexion à Supabase
-                configurée et les données saisies depuis le tableau de bord
-                admin.
+              <p className="mt-4 text-texte-light leading-relaxed">
+                Notre spécialité — poulet entier rôti lentement à la broche,
+                pour une peau croustillante et une chair juteuse et savoureuse.
+                Préparé quotidiennement avec des produits frais.
               </p>
-              <div className="mt-6 inline-flex items-center rounded-full bg-success/20 px-4 py-2 text-sm font-medium text-success w-fit">
+              <div className="mt-6 inline-flex items-center rounded-full bg-success/10 px-4 py-2 text-sm font-medium text-success w-fit">
                 Disponible
               </div>
+              <p className="mt-6 text-sm text-texte-lighter">
+                Prix et description complétés par le gestionnaire depuis le tableau de bord admin.
+              </p>
             </div>
           </FadeIn>
         </div>
@@ -60,16 +66,18 @@ export default function PlatDetailPage() {
               Vous aimerez aussi
             </h2>
             <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
-              {Array.from({ length: 3 }).map((_, i) => (
+              {[3, 6, 9].map((imgIdx) => (
                 <div
-                  key={i}
+                  key={imgIdx}
                   className="rounded-2xl bg-blanc shadow-sm overflow-hidden"
                 >
-                  <div className="aspect-square">
-                    <PlaceholderImage
-                      alt={`Suggestion ${i + 1}`}
-                      size="sm"
-                      className="w-full h-full"
+                  <div className="aspect-square relative">
+                    <Image
+                      src={getPlatImage(imgIdx)}
+                      alt="Plat similaire"
+                      fill
+                      className="object-cover"
+                      sizes="(max-width: 768px) 50vw, 33vw"
                     />
                   </div>
                   <div className="p-3">

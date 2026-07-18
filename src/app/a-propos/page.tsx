@@ -1,8 +1,9 @@
 import type { Metadata } from "next";
-import SectionTitle from "@/components/SectionTitle";
-import PlaceholderImage from "@/components/PlaceholderImage";
-import FadeIn from "@/components/FadeIn";
+import Image from "next/image";
 import Link from "next/link";
+import SectionTitle from "@/components/SectionTitle";
+import FadeIn from "@/components/FadeIn";
+import { getPlatImage } from "@/lib/images";
 
 export const metadata: Metadata = {
   title: "À propos",
@@ -21,11 +22,13 @@ export default function AProposPage() {
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
           <FadeIn>
-            <div className="relative rounded-3xl overflow-hidden shadow-xl">
-              <PlaceholderImage
+            <div className="relative rounded-3xl overflow-hidden shadow-xl aspect-[4/3]">
+              <Image
+                src={getPlatImage(60)}
                 alt="A Cas'a Mina - Le lieu"
-                size="lg"
-                className="w-full"
+                fill
+                className="object-cover"
+                sizes="(max-width: 1024px) 100vw, 50vw"
               />
             </div>
           </FadeIn>

@@ -1,23 +1,24 @@
 "use client";
 
 import { useState } from "react";
+import Image from "next/image";
 import { motion, AnimatePresence } from "framer-motion";
 import SectionTitle from "@/components/SectionTitle";
-import PlaceholderImage from "@/components/PlaceholderImage";
 import { X, ChevronLeft, ChevronRight } from "lucide-react";
+import { PLATS_IMAGES } from "@/lib/images";
 
 const themes = ["Tous", "Plats", "Lieu", "Coulisses", "Événements"];
-
-const photos = Array.from({ length: 12 }).map((_, i) => ({
-  id: i,
-  src: `/images/galerie/${i + 1}.jpg`,
-  alt: `Photo ${i + 1}`,
-  theme: themes[1 + (i % 4)],
-}));
 
 export default function GaleriePage() {
   const [filter, setFilter] = useState("Tous");
   const [lightbox, setLightbox] = useState<number | null>(null);
+
+  const photos = PLATS_IMAGES.map((src, i) => ({
+    id: i,
+    src,
+    alt: `Photo ${i + 1}`,
+    theme: themes[1 + (i % 4)],
+  }));
 
   const filtered =
     filter === "Tous" ? photos : photos.filter((p) => p.theme === filter);
@@ -55,8 +56,13 @@ export default function GaleriePage() {
           ))}
         </div>
 
-        {/* Grille */}
-        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3">
+        {/* Nombre de photos */}
+        <p className="text-center text-sm text-texte-lighter mb-6">
+          {filtered.length} photo{filtered.length > 1 ? "s" : ""}
+        </p>
+
+        {/* Grille masonry-like */}
+        <div className="columns-2 sm:columns-3 lg:columns-4 gap-3 space-y-3">
           {filtered.map((photo, index) => (
             <motion.button
               key={photo.id}
@@ -66,14 +72,17 @@ export default function GaleriePage() {
               exit={{ opacity: 0 }}
               transition={{ duration: 0.3 }}
               onClick={() => openLightbox(index)}
-              className="group aspect-square overflow-hidden rounded-xl focus:outline-none focus:ring-2 focus:ring-marine"
+              className="group break-inside-avoid focus:outline-none focus:ring-2 focus:ring-marine rounded-xl overflow-hidden"
             >
-              <div className="relative w-full h-full bg-border-light">
-                <PlaceholderImage
+              <div className="relative w-full aspect-square bg-border-light">
+                <Image
+                  src={photo.src}
                   alt={photo.alt}
-                  size="sm"
-                  className="w-full h-full transition-transform duration-500 group-hover:scale-110"
+                  fill
+                  className="object-cover transition-transform duration-500 group-hover:scale-110"
+                  sizes="(max-width: 768px) 50vw, (max-width: 1200px) 33vw, 25vw"
                 />
+                <div className="absolute inset-0 bg-marine/0 transition-colors group-hover:bg-marine/20" />
               </div>
             </motion.button>
           ))}
@@ -82,17 +91,17 @@ export default function GaleriePage() {
 
       {/* Lightbox */}
       <AnimatePresence>
-        {lightbox !== null && (
+        {lightbox !== null && filtered[lightbox] && (
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 z-[100] bg-black/90 flex items-center justify-center p-4"
+            className="fixed inset-0 z-[100] bg-black/95 flex items-center justify-center p-4"
             onClick={closeLightbox}
           >
             <button
               onClick={closeLightbox}
-              className="absolute top-4 right-4 text-creme/80 hover:text-creme transition-colors"
+              className="absolute top-4 right-4 text-creme/80 hover:text-creme transition-colors z-10"
             >
               <X size={32} />
             </button>
@@ -102,20 +111,26 @@ export default function GaleriePage() {
                 e.stopPropagation();
                 navigate(-1);
               }}
-              className="absolute left-4 text-creme/80 hover:text-creme transition-colors"
+              className="absolute left-4 text-creme/80 hover:text-creme transition-colors z-10"
             >
               <ChevronLeft size={40} />
             </button>
 
             <div
-              className="relative max-w-4xl max-h-[80vh] w-full aspect-square"
+              className="relative max-w-5xl max-h-[85vh] w-full aspect-square"
               onClick={(e) => e.stopPropagation()}
             >
-              <PlaceholderImage
-                alt={filtered[lightbox]?.alt || ""}
-                size="xl"
-                className="w-full h-full rounded-lg"
+              <Image
+                src={filtered[lightbox].src}
+                alt={filtered[lightbox].alt}
+                fill
+                className="object-contain rounded-lg"
+                sizes="100vw"
               />
+            </div>
+
+            <div className="absolute bottom-4 left-1/2 -translate-x-1/2 text-creme/60 text-sm">
+              {lightbox + 1} / {filtered.length}
             </div>
 
             <button
@@ -123,7 +138,7 @@ export default function GaleriePage() {
                 e.stopPropagation();
                 navigate(1);
               }}
-              className="absolute right-4 text-creme/80 hover:text-creme transition-colors"
+              className="absolute right-4 text-creme/80 hover:text-creme transition-colors z-10"
             >
               <ChevronRight size={40} />
             </button>

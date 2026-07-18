@@ -1,8 +1,7 @@
 "use client";
 
-import Image from "next/image";
 import Link from "next/link";
-import { motion } from "framer-motion";
+import Image from "next/image";
 import {
   MapPin,
   ChevronRight,
@@ -12,24 +11,34 @@ import {
 import InstagramIcon from "@/components/InstagramIcon";
 import FadeIn from "@/components/FadeIn";
 import SectionTitle from "@/components/SectionTitle";
-import PlaceholderImage from "@/components/PlaceholderImage";
+import { getPlatImage, getGalerieImages } from "@/lib/images";
 
 const featuredPlats = [
-  { id: "1", nom: "Poulet rôti à la broche", categorie: "Poulets rôtis", disponible: true },
-  { id: "2", nom: "Civet de sanglier", categorie: "Plats du jour", disponible: true },
-  { id: "3", nom: "Far breton aux pruneaux", categorie: "Desserts maison", disponible: true },
-  { id: "4", nom: "Courgettes farcies", categorie: "Plats du jour", disponible: false },
+  { id: "1", nom: "Poulet rôti à la broche", categorie: "Poulets rôtis", disponible: true, imgIdx: 0 },
+  { id: "2", nom: "Civet de sanglier", categorie: "Plats du jour", disponible: true, imgIdx: 4 },
+  { id: "3", nom: "Far breton aux pruneaux", categorie: "Desserts maison", disponible: true, imgIdx: 8 },
+  { id: "4", nom: "Courgettes farcies", categorie: "Plats du jour", disponible: false, imgIdx: 12 },
 ];
+
+const instagramImages = getGalerieImages(6);
 
 export default function Home() {
   return (
     <>
       {/* Hero */}
       <section className="relative min-h-[85vh] flex items-center overflow-hidden bg-marine">
-        <div className="absolute inset-0 bg-gradient-to-br from-marine via-marine to-marine-light opacity-90" />
-        <div className="absolute inset-0 opacity-10">
-          <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_50%,rgba(212,175,55,0.15),transparent_50%)]" />
+        <div className="absolute inset-0">
+          <Image
+            src={getPlatImage(0)}
+            alt="Poulet rôti à la broche"
+            fill
+            className="object-cover"
+            priority
+            sizes="100vw"
+          />
+          <div className="absolute inset-0 bg-marine/70" />
         </div>
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_50%,rgba(212,175,55,0.15),transparent_50%)]" />
         <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-20">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
             <FadeIn>
@@ -71,10 +80,13 @@ export default function Home() {
             <FadeIn delay={0.2} className="hidden lg:block">
               <div className="relative">
                 <div className="relative aspect-square rounded-3xl overflow-hidden shadow-2xl">
-                  <PlaceholderImage
+                  <Image
+                    src={getPlatImage(0)}
                     alt="Poulet rôti à la broche"
-                    size="xl"
-                    className="w-full h-full"
+                    fill
+                    className="object-cover"
+                    sizes="500px"
+                    priority
                   />
                 </div>
                 <div className="absolute -bottom-6 -left-6 rounded-2xl bg-dore p-4 shadow-xl">
@@ -119,11 +131,13 @@ export default function Home() {
               <FadeIn key={plat.id} delay={index * 0.1}>
                 <Link href={`/carte/${plat.id}`} className="group block">
                   <div className="relative overflow-hidden rounded-2xl bg-blanc shadow-md transition-all duration-300 hover:shadow-xl hover:-translate-y-1">
-                    <div className="aspect-square">
-                      <PlaceholderImage
+                    <div className="aspect-square relative">
+                      <Image
+                        src={getPlatImage(plat.imgIdx)}
                         alt={plat.nom}
-                        size="md"
-                        className="w-full h-full transition-transform duration-500 group-hover:scale-110"
+                        fill
+                        className="object-cover transition-transform duration-500 group-hover:scale-110"
+                        sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 25vw"
                       />
                     </div>
                     <div className="p-4">
@@ -222,10 +236,12 @@ export default function Home() {
               </FadeIn>
               <FadeIn delay={0.1}>
                 <div className="relative min-h-[300px]">
-                  <PlaceholderImage
+                  <Image
+                    src={getPlatImage(20)}
                     alt="Événement - Commande groupée"
-                    size="lg"
-                    className="w-full h-full"
+                    fill
+                    className="object-cover"
+                    sizes="(max-width: 1024px) 100vw, 50vw"
                   />
                 </div>
               </FadeIn>
@@ -303,7 +319,7 @@ export default function Home() {
             subtitle="Retrouvez nos coulisses et nos plats du jour sur Instagram"
           />
           <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
-            {Array.from({ length: 6 }).map((_, i) => (
+            {instagramImages.map((imgSrc, i) => (
               <FadeIn key={i} delay={i * 0.05}>
                 <a
                   href="https://instagram.com/acas_a_mina"
@@ -311,11 +327,13 @@ export default function Home() {
                   rel="noopener noreferrer"
                   className="group block aspect-square overflow-hidden rounded-xl"
                 >
-                  <div className="relative w-full h-full bg-border-light transition-transform duration-300 group-hover:scale-105">
-                    <PlaceholderImage
+                  <div className="relative w-full h-full transition-transform duration-300 group-hover:scale-105">
+                    <Image
+                      src={imgSrc}
                       alt={`Publication Instagram ${i + 1}`}
-                      size="sm"
-                      className="w-full h-full"
+                      fill
+                      className="object-cover"
+                      sizes="(max-width: 768px) 50vw, (max-width: 1200px) 33vw, 16vw"
                     />
                     <div className="absolute inset-0 bg-marine/0 transition-colors group-hover:bg-marine/30 flex items-center justify-center">
                       <InstagramIcon

@@ -1,11 +1,11 @@
 "use client";
 
 import { useState } from "react";
-import type { Metadata } from "next";
+import Image from "next/image";
 import SectionTitle from "@/components/SectionTitle";
 import FadeIn from "@/components/FadeIn";
-import PlaceholderImage from "@/components/PlaceholderImage";
 import { Send, CheckCircle } from "lucide-react";
+import { getPlatImage } from "@/lib/images";
 
 const occasions = [
   "Mariage",
@@ -29,11 +29,13 @@ export default function EvenementsPage() {
         {/* Introduction */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center mb-16">
           <FadeIn>
-            <div className="relative rounded-3xl overflow-hidden shadow-xl">
-              <PlaceholderImage
+            <div className="relative rounded-3xl overflow-hidden shadow-xl aspect-[4/3]">
+              <Image
+                src={getPlatImage(40)}
                 alt="Événement A Cas'a Mina"
-                size="lg"
-                className="w-full"
+                fill
+                className="object-cover"
+                sizes="(max-width: 1024px) 100vw, 50vw"
               />
             </div>
           </FadeIn>
@@ -71,11 +73,13 @@ export default function EvenementsPage() {
             </h3>
             <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
               {Array.from({ length: 8 }).map((_, i) => (
-                <div key={i} className="aspect-square rounded-xl overflow-hidden">
-                  <PlaceholderImage
+                <div key={i} className="aspect-square rounded-xl overflow-hidden relative">
+                  <Image
+                    src={getPlatImage(50 + i * 2)}
                     alt={`Réalisation ${i + 1}`}
-                    size="sm"
-                    className="w-full h-full"
+                    fill
+                    className="object-cover"
+                    sizes="(max-width: 768px) 50vw, 25vw"
                   />
                 </div>
               ))}
