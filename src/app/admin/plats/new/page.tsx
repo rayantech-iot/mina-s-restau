@@ -88,6 +88,14 @@ export default function NewPlatPage() {
       return;
     }
 
+    if (imageUrl) {
+      await supabase.from("galerie_images").insert({
+        url: imageUrl,
+        alt: nom.trim(),
+        ordre: 0,
+      });
+    }
+
     router.push("/admin/plats");
   };
 

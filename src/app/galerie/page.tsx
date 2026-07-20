@@ -1,8 +1,10 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
+import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
 import SectionTitle from "@/components/SectionTitle";
+import FadeIn from "@/components/FadeIn";
 import { X, ChevronLeft, ChevronRight } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
 
@@ -101,6 +103,26 @@ export default function GaleriePage() {
             </div>
           </>
         )}
+      </div>
+
+      {/* CTA Devis */}
+      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 pb-12">
+        <FadeIn>
+          <div className="rounded-3xl bg-marine p-8 lg:p-12 text-center">
+            <h3 className="font-serif text-2xl font-bold text-creme mb-3">
+              Vous avez un projet en tête ?
+            </h3>
+            <p className="text-creme/70 mb-6 max-w-lg mx-auto">
+              Mariage, anniversaire, événement d&apos;entreprise — nous créons un menu sur mesure pour votre occasion.
+            </p>
+            <Link
+              href="/evenements"
+              className="inline-flex items-center gap-2 rounded-full bg-dore px-6 py-3 text-sm font-semibold text-marine transition-all hover:bg-dore-light hover:scale-105"
+            >
+              Demander un devis gratuit
+            </Link>
+          </div>
+        </FadeIn>
       </div>
 
       <AnimatePresence>

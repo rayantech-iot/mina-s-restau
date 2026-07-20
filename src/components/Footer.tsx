@@ -30,7 +30,7 @@ export default function Footer() {
               {[
                 { href: "/carte", label: "La Carte" },
                 { href: "/a-propos", label: "À propos" },
-                { href: "/evenements", label: "Événements" },
+                { href: "/evenements", label: "Événements & Devis" },
                 { href: "/galerie", label: "Galerie" },
                 { href: "/faq", label: "FAQ" },
                 { href: "/contact", label: "Contact" },

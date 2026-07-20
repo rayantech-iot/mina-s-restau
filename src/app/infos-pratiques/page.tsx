@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import SectionTitle from "@/components/SectionTitle";
 import FadeIn from "@/components/FadeIn";
 import { MapPin, Clock, Phone } from "lucide-react";
+import Link from "next/link";
 import { createClient } from "@/lib/supabase/client";
 
 const defaultHoraires: Record<string, { ouverture: string; fermeture: string } | null> = {
@@ -53,11 +54,11 @@ export default function InfosPratiquesPage() {
     return `${formatTime(h.ouverture)} - ${formatTime(h.fermeture)}`;
   };
 
-  const defaultMapEmbed = "https://www.google.com/maps?q=Route+de+Cirendino,+20144+Sainte-Lucie+de+Porto-Vecchio,+France&output=embed";
-  const mapSrc = googleMapsUrl
-    ? googleMapsUrl.replace(/\/maps\/place\/.*$/, "").includes("google.com/maps")
-      ? googleMapsUrl.replace("maps?q=", "maps/embed?output=embed&q=")
-      : defaultMapEmbed
+  const defaultMapEmbed = "https://www.google.com/maps?q=Route+de+Cirendino+20144+Sainte-Lucie+de+Porto-Vecchio+Corse&output=embed&z=14";
+  const mapSrc = googleMapsUrl && googleMapsUrl.includes("google.com/maps")
+    ? googleMapsUrl.includes("embed")
+      ? googleMapsUrl
+      : googleMapsUrl + "&output=embed"
     : defaultMapEmbed;
 
   return (
@@ -141,6 +142,24 @@ export default function InfosPratiquesPage() {
                 </div>
               ))}
             </div>
+          </div>
+        </FadeIn>
+
+        {/* CTA Devis */}
+        <FadeIn>
+          <div className="mt-12 rounded-3xl bg-marine p-8 lg:p-12 text-center">
+            <h3 className="font-serif text-2xl font-bold text-creme mb-3">
+              Un événement à préparer ?
+            </h3>
+            <p className="text-creme/70 mb-6 max-w-lg mx-auto">
+              Nous créons des menus sur mesure pour mariages, anniversaires et événements. Devis gratuit !
+            </p>
+            <Link
+              href="/evenements"
+              className="inline-flex items-center gap-2 rounded-full bg-dore px-6 py-3 text-sm font-semibold text-marine transition-all hover:bg-dore-light hover:scale-105"
+            >
+              Demander un devis
+            </Link>
           </div>
         </FadeIn>
       </div>

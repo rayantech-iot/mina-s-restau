@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
 import SectionTitle from "@/components/SectionTitle";
 import FadeIn from "@/components/FadeIn";
 import { Phone, MessageCircle, Send, CheckCircle } from "lucide-react";
@@ -177,6 +178,23 @@ export default function ContactPage() {
             </div>
           </FadeIn>
         </div>
+
+        <FadeIn>
+          <div className="mt-12 rounded-3xl bg-creme border border-border p-8 text-center">
+            <h3 className="font-serif text-xl font-bold text-marine mb-2">
+              Besoin d&apos;un devis pour un événement ?
+            </h3>
+            <p className="text-texte-light mb-4 text-sm">
+              Mariages, anniversaires, réunions — nous créons un menu sur mesure.
+            </p>
+            <Link
+              href="/evenements"
+              className="inline-flex items-center gap-2 rounded-full bg-marine px-6 py-3 text-sm font-semibold text-creme transition-all hover:bg-marine-light"
+            >
+              Demander un devis
+            </Link>
+          </div>
+        </FadeIn>
       </div>
     </div>
   );

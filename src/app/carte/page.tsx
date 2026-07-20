@@ -149,6 +149,24 @@ export default function CartePage() {
           </>
         )}
 
+        {/* CTA Devis */}
+        <FadeIn>
+          <div className="mt-16 rounded-3xl bg-creme border border-border p-8 lg:p-12 text-center">
+            <h3 className="font-serif text-2xl font-bold text-marine mb-3">
+              Vous avez un projet événementiel ?
+            </h3>
+            <p className="text-texte-light mb-6 max-w-lg mx-auto">
+              Mariage, anniversaire, réunion — nous proposons des menus sur mesure. Devis gratuit et sans engagement.
+            </p>
+            <Link
+              href="/evenements"
+              className="inline-flex items-center gap-2 rounded-full bg-marine px-6 py-3 text-sm font-semibold text-creme transition-all hover:bg-marine-light"
+            >
+              Demander un devis
+            </Link>
+          </div>
+        </FadeIn>
+
         {/* CTA Instagram */}
         <FadeIn>
           <div className="mt-16 rounded-3xl bg-marine p-8 lg:p-12 text-center">

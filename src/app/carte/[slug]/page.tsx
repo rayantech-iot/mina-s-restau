@@ -28,10 +28,14 @@ export default function PlatDetailPage({ params }: { params: Promise<{ id: strin
   const [plat, setPlat] = useState<Plat | null>(null);
   const [categorie, setCategorie] = useState<Categorie | null>(null);
   const [loading, setLoading] = useState(true);
+  const [telephone, setTelephone] = useState("0676772275");
   const supabase = createClient();
 
   useEffect(() => {
     loadPlat();
+    supabase.from("reglages").select("telephone").limit(1).single().then(({ data }) => {
+      if (data?.telephone) setTelephone(data.telephone.replace(/\s/g, ""));
+    });
   }, []);
 
   const loadPlat = async () => {
@@ -130,7 +134,7 @@ export default function PlatDetailPage({ params }: { params: Promise<{ id: strin
               </div>
               <div className="mt-8">
                 <a
-                  href="tel:+33676772275"
+                  href={`tel:${telephone}`}
                   className="inline-flex items-center gap-2 rounded-full bg-marine px-6 py-3 text-sm font-semibold text-creme transition-all hover:bg-marine-light"
                 >
                   Commander par téléphone

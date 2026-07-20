@@ -124,6 +124,14 @@ export default function EditPlatPage({ params }: { params: Promise<{ id: string 
       return;
     }
 
+    if (imageUrl && imageFile) {
+      await supabase.from("galerie_images").insert({
+        url: imageUrl,
+        alt: nom.trim(),
+        ordre: 0,
+      });
+    }
+
     router.push("/admin/plats");
   };
 
