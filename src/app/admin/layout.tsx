@@ -85,7 +85,7 @@ export default function AdminLayout({
         <div className="p-4">
           <div className="mb-6 px-3">
             <Image
-              src="/images/logo.svg"
+              src="/images/galerie/logo.jpg"
               alt="A Cas'a Mina"
               width={140}
               height={48}

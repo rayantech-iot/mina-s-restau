@@ -1,15 +1,66 @@
-import type { Metadata } from "next";
+"use client";
+
+import { use, useState, useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { ArrowLeft } from "lucide-react";
 import FadeIn from "@/components/FadeIn";
-import { getPlatImage } from "@/lib/images";
+import { createClient } from "@/lib/supabase/client";
 
-export const metadata: Metadata = {
-  title: "Fiche plat",
-};
+interface Plat {
+  id: string;
+  nom: string;
+  description: string | null;
+  image_url: string;
+  categorie_id: string | null;
+  prix: number | null;
+  afficher_prix: boolean;
+  statut: string;
+}
 
-export default function PlatDetailPage() {
+interface Categorie {
+  id: string;
+  nom: string;
+}
+
+export default function PlatDetailPage({ params }: { params: Promise<{ id: string }> }) {
+  const { id } = use(params);
+  const [plat, setPlat] = useState<Plat | null>(null);
+  const [categorie, setCategorie] = useState<Categorie | null>(null);
+  const [loading, setLoading] = useState(true);
+  const supabase = createClient();
+
+  useEffect(() => {
+    loadPlat();
+  }, []);
+
+  const loadPlat = async () => {
+    const { data: p } = await supabase.from("plats").select("*").eq("id", id).single();
+    if (p) {
+      setPlat(p);
+      if (p.categorie_id) {
+        const { data: c } = await supabase.from("categories").select("id, nom").eq("id", p.categorie_id).single();
+        setCategorie(c);
+      }
+    }
+    setLoading(false);
+  };
+
+  if (loading) {
+    return <div className="text-center py-20 text-texte-light">Chargement...</div>;
+  }
+
+  if (!plat) {
+    return (
+      <div className="text-center py-20">
+        <p className="text-texte-light mb-4">Plat introuvable.</p>
+        <Link href="/carte" className="text-marine underline hover:text-dore">
+          Retour à la carte
+        </Link>
+      </div>
+    );
+  }
+
   return (
     <div className="py-12 lg:py-20">
       <div className="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8">
@@ -25,71 +76,69 @@ export default function PlatDetailPage() {
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12">
           <FadeIn>
-            <div className="rounded-3xl overflow-hidden shadow-xl aspect-square relative">
-              <Image
-                src={getPlatImage(0)}
-                alt="Photo du plat"
-                fill
-                className="object-cover"
-                sizes="(max-width: 1024px) 100vw, 50vw"
-              />
+            <div className="rounded-3xl overflow-hidden shadow-xl aspect-square relative bg-border-light">
+              {plat.image_url ? (
+                <img
+                  src={plat.image_url}
+                  alt={plat.nom}
+                  className="absolute inset-0 w-full h-full object-cover"
+                />
+              ) : (
+                <div className="absolute inset-0 flex items-center justify-center text-texte-lighter">
+                  Pas de photo
+                </div>
+              )}
             </div>
           </FadeIn>
 
           <FadeIn delay={0.15}>
             <div className="flex flex-col justify-center">
-              <span className="text-sm font-medium text-dore uppercase tracking-wider">
-                Poulets rôtis à la broche
-              </span>
+              {categorie && (
+                <span className="text-sm font-medium text-dore uppercase tracking-wider">
+                  {categorie.nom}
+                </span>
+              )}
               <h1 className="mt-2 font-serif text-3xl font-bold text-marine sm:text-4xl lg:text-5xl">
-                Poulet rôti à la broche
+                {plat.nom}
               </h1>
-              <p className="mt-4 text-texte-light leading-relaxed">
-                Notre spécialité — poulet entier rôti lentement à la broche,
-                pour une peau croustillante et une chair juteuse et savoureuse.
-                Préparé quotidiennement avec des produits frais.
-              </p>
-              <div className="mt-6 inline-flex items-center rounded-full bg-success/10 px-4 py-2 text-sm font-medium text-success w-fit">
-                Disponible
+              {plat.description && (
+                <p className="mt-4 text-texte-light leading-relaxed">
+                  {plat.description}
+                </p>
+              )}
+              <div className="mt-4 flex items-center gap-3">
+                <span
+                  className={`inline-flex items-center rounded-full px-4 py-2 text-sm font-medium ${
+                    plat.statut === "disponible"
+                      ? "bg-success/10 text-success"
+                      : plat.statut === "sur_commande"
+                      ? "bg-dore/10 text-marine"
+                      : "bg-error/10 text-error"
+                  }`}
+                >
+                  {plat.statut === "disponible"
+                    ? "Disponible"
+                    : plat.statut === "sur_commande"
+                    ? "Sur commande"
+                    : "Indisponible"}
+                </span>
+                {plat.afficher_prix && plat.prix != null && (
+                  <span className="text-lg font-bold text-marine">
+                    {plat.prix.toFixed(2)} €
+                  </span>
+                )}
               </div>
-              <p className="mt-6 text-sm text-texte-lighter">
-                Prix et description complétés par le gestionnaire depuis le tableau de bord admin.
-              </p>
+              <div className="mt-8">
+                <a
+                  href="tel:+33676772275"
+                  className="inline-flex items-center gap-2 rounded-full bg-marine px-6 py-3 text-sm font-semibold text-creme transition-all hover:bg-marine-light"
+                >
+                  Commander par téléphone
+                </a>
+              </div>
             </div>
           </FadeIn>
         </div>
-
-        {/* Suggestions */}
-        <FadeIn>
-          <div className="mt-16">
-            <h2 className="font-serif text-2xl font-bold text-marine mb-6">
-              Vous aimerez aussi
-            </h2>
-            <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
-              {[3, 6, 9].map((imgIdx) => (
-                <div
-                  key={imgIdx}
-                  className="rounded-2xl bg-blanc shadow-sm overflow-hidden"
-                >
-                  <div className="aspect-square relative">
-                    <Image
-                      src={getPlatImage(imgIdx)}
-                      alt="Plat similaire"
-                      fill
-                      className="object-cover"
-                      sizes="(max-width: 768px) 50vw, 33vw"
-                    />
-                  </div>
-                  <div className="p-3">
-                    <p className="text-sm font-medium text-marine">
-                      Plat à venir
-                    </p>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-        </FadeIn>
       </div>
     </div>
   );

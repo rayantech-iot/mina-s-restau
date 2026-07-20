@@ -1,27 +1,56 @@
 "use client";
 
-import { useState, useCallback } from "react";
-import Image from "next/image";
+import { useState, useEffect, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import SectionTitle from "@/components/SectionTitle";
 import { X, ChevronLeft, ChevronRight } from "lucide-react";
-import { PLATS_IMAGES } from "@/lib/images";
+import { createClient } from "@/lib/supabase/client";
 
-const themes = ["Tous", "Plats", "Lieu", "Coulisses", "Événements"];
+interface GalerieImage {
+  id: string;
+  url: string;
+  alt: string;
+}
+
+interface PlatImage {
+  id: string;
+  image_url: string;
+  nom: string;
+}
 
 export default function GaleriePage() {
-  const [filter, setFilter] = useState("Tous");
   const [lightbox, setLightbox] = useState<number | null>(null);
+  const [allImages, setAllImages] = useState<{ id: string; src: string; alt: string }[]>([]);
+  const [loading, setLoading] = useState(true);
+  const supabase = createClient();
 
-  const photos = PLATS_IMAGES.map((src, i) => ({
-    id: i,
-    src,
-    alt: `Photo ${i + 1}`,
-    theme: themes[1 + (i % 4)],
-  }));
+  useEffect(() => {
+    loadImages();
+  }, []);
 
-  const filtered =
-    filter === "Tous" ? photos : photos.filter((p) => p.theme === filter);
+  const loadImages = async () => {
+    const [platsRes, galerieRes] = await Promise.all([
+      supabase.from("plats").select("id, image_url, nom").not("image_url", "eq", ""),
+      supabase.from("galerie_images").select("id, url, alt").order("ordre", { ascending: true }),
+    ]);
+
+    const platImages: { id: string; src: string; alt: string }[] =
+      (platsRes.data || []).map((p: PlatImage) => ({
+        id: `plat-${p.id}`,
+        src: p.image_url,
+        alt: p.nom,
+      }));
+
+    const galerieImages: { id: string; src: string; alt: string }[] =
+      (galerieRes.data || []).map((g: GalerieImage) => ({
+        id: g.id,
+        src: g.url,
+        alt: g.alt,
+      }));
+
+    setAllImages([...platImages, ...galerieImages]);
+    setLoading(false);
+  };
 
   const openLightbox = useCallback((index: number) => setLightbox(index), []);
   const closeLightbox = useCallback(() => setLightbox(null), []);
@@ -29,9 +58,9 @@ export default function GaleriePage() {
   const navigate = useCallback(
     (dir: number) => {
       if (lightbox === null) return;
-      setLightbox((lightbox + dir + filtered.length) % filtered.length);
+      setLightbox((lightbox + dir + allImages.length) % allImages.length);
     },
-    [lightbox, filtered.length]
+    [lightbox, allImages.length]
   );
 
   return (
@@ -39,57 +68,43 @@ export default function GaleriePage() {
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <SectionTitle
           title="Galerie"
-          subtitle="Nos plats, notre lieu, nos coulisses"
+          subtitle="Nos plats, nos creations, nos coulisses"
         />
 
-        {/* Filtres */}
-        <div className="mb-10 flex flex-wrap justify-center gap-2">
-          {themes.map((theme) => (
-            <button
-              key={theme}
-              onClick={() => setFilter(theme)}
-              className={`rounded-full px-4 py-2 text-sm font-medium transition-all ${
-                filter === theme
-                  ? "bg-marine text-creme"
-                  : "bg-blanc text-texte-light border border-border hover:border-marine hover:text-marine"
-              }`}
-            >
-              {theme}
-            </button>
-          ))}
-        </div>
+        {loading ? (
+          <div className="text-center py-16 text-texte-light">Chargement...</div>
+        ) : (
+          <>
+            <p className="text-center text-sm text-texte-lighter mb-6">
+              {allImages.length} photo{allImages.length > 1 ? "s" : ""}
+            </p>
 
-        {/* Nombre de photos */}
-        <p className="text-center text-sm text-texte-lighter mb-6">
-          {filtered.length} photo{filtered.length > 1 ? "s" : ""}
-        </p>
-
-        {/* Grille */}
-        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3">
-          {filtered.map((photo) => (
-            <motion.button
-              key={photo.id}
-              initial={{ opacity: 0, scale: 0.95 }}
-              animate={{ opacity: 1, scale: 1 }}
-              transition={{ duration: 0.3 }}
-              onClick={() => openLightbox(photo.id)}
-              className="group relative aspect-square focus:outline-none focus:ring-2 focus:ring-marine rounded-xl overflow-hidden bg-border-light"
-            >
-              <img
-                src={photo.src}
-                alt={photo.alt}
-                loading="lazy"
-                className="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
-              />
-              <div className="absolute inset-0 bg-marine/0 transition-colors group-hover:bg-marine/20" />
-            </motion.button>
-          ))}
-        </div>
+            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3">
+              {allImages.map((photo) => (
+                <motion.button
+                  key={photo.id}
+                  initial={{ opacity: 0, scale: 0.95 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  transition={{ duration: 0.3 }}
+                  onClick={() => openLightbox(allImages.indexOf(photo))}
+                  className="group relative aspect-square focus:outline-none focus:ring-2 focus:ring-marine rounded-xl overflow-hidden bg-border-light"
+                >
+                  <img
+                    src={photo.src}
+                    alt={photo.alt}
+                    loading="lazy"
+                    className="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+                  />
+                  <div className="absolute inset-0 bg-marine/0 transition-colors group-hover:bg-marine/20" />
+                </motion.button>
+              ))}
+            </div>
+          </>
+        )}
       </div>
 
-      {/* Lightbox */}
       <AnimatePresence>
-        {lightbox !== null && filtered[lightbox] && (
+        {lightbox !== null && allImages[lightbox] && (
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
@@ -103,37 +118,24 @@ export default function GaleriePage() {
             >
               <X size={32} />
             </button>
-
             <button
-              onClick={(e) => {
-                e.stopPropagation();
-                navigate(-1);
-              }}
+              onClick={(e) => { e.stopPropagation(); navigate(-1); }}
               className="absolute left-4 text-creme/80 hover:text-creme transition-colors z-10"
             >
               <ChevronLeft size={40} />
             </button>
-
-            <div
-              className="relative max-w-5xl max-h-[85vh] w-full"
-              onClick={(e) => e.stopPropagation()}
-            >
+            <div className="relative max-w-5xl max-h-[85vh] w-full" onClick={(e) => e.stopPropagation()}>
               <img
-                src={filtered[lightbox].src}
-                alt={filtered[lightbox].alt}
+                src={allImages[lightbox].src}
+                alt={allImages[lightbox].alt}
                 className="max-h-[85vh] w-full object-contain rounded-lg"
               />
             </div>
-
             <div className="absolute bottom-4 left-1/2 -translate-x-1/2 text-creme/60 text-sm">
-              {lightbox + 1} / {filtered.length}
+              {allImages[lightbox].alt} — {lightbox + 1} / {allImages.length}
             </div>
-
             <button
-              onClick={(e) => {
-                e.stopPropagation();
-                navigate(1);
-              }}
+              onClick={(e) => { e.stopPropagation(); navigate(1); }}
               className="absolute right-4 text-creme/80 hover:text-creme transition-colors z-10"
             >
               <ChevronRight size={40} />

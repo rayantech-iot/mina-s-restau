@@ -1,10 +1,11 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { motion, AnimatePresence } from "framer-motion";
 import { Menu, X, Phone } from "lucide-react";
+import { createClient } from "@/lib/supabase/client";
 
 const navLinks = [
   { href: "/carte", label: "La Carte" },
@@ -18,15 +19,24 @@ const navLinks = [
 
 export default function Header() {
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [telephone, setTelephone] = useState("");
+
+  useEffect(() => {
+    const supabase = createClient();
+    supabase.from("reglages").select("telephone").limit(1).single().then(({ data }) => {
+      if (data?.telephone) setTelephone(data.telephone);
+    });
+  }, []);
+
+  const phoneLink = telephone ? `tel:${telephone.replace(/\s/g, "")}` : "tel:";
 
   return (
     <header className="sticky top-0 z-50 bg-marine shadow-lg">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="flex h-16 items-center justify-between sm:h-20">
-          {/* Logo */}
           <Link href="/" className="flex-shrink-0">
             <Image
-              src="/images/logo.svg"
+              src="/images/galerie/logo.jpg"
               alt="A Cas'a Mina"
               width={140}
               height={48}
@@ -35,7 +45,6 @@ export default function Header() {
             />
           </Link>
 
-          {/* Desktop nav */}
           <nav className="hidden lg:flex lg:items-center lg:gap-1">
             {navLinks.map((link) => (
               <Link
@@ -48,10 +57,9 @@ export default function Header() {
             ))}
           </nav>
 
-          {/* CTA Appeler + mobile toggle */}
           <div className="flex items-center gap-3">
             <a
-              href="tel:"
+              href={phoneLink}
               className="inline-flex items-center gap-2 rounded-full bg-dore px-4 py-2 text-sm font-semibold text-marine transition-all hover:bg-dore-light hover:scale-105"
             >
               <Phone size={16} />
@@ -70,7 +78,6 @@ export default function Header() {
         </div>
       </div>
 
-      {/* Mobile menu */}
       <AnimatePresence>
         {mobileOpen && (
           <motion.div

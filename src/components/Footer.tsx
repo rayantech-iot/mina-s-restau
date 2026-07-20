@@ -8,14 +8,13 @@ export default function Footer() {
     <footer className="bg-marine text-creme/80">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-12 lg:py-16">
         <div className="grid grid-cols-1 gap-10 md:grid-cols-2 lg:grid-cols-4">
-          {/* Logo & présentation */}
           <div className="lg:col-span-1">
             <Image
-              src="/images/logo.svg"
+              src="/images/galerie/logo.jpg"
               alt="A Cas'a Mina"
               width={160}
               height={56}
-              className="h-14 w-auto mb-4"
+              className="h-14 w-auto mb-4 rounded"
             />
             <p className="text-sm leading-relaxed text-creme/60">
               Restaurant à emporter en Corse. Poulets rôtis à la broche et plats
@@ -23,7 +22,6 @@ export default function Footer() {
             </p>
           </div>
 
-          {/* Navigation */}
           <div>
             <h3 className="font-serif text-lg font-semibold text-creme mb-4">
               Navigation
@@ -49,7 +47,6 @@ export default function Footer() {
             </ul>
           </div>
 
-          {/* Coordonnées */}
           <div>
             <h3 className="font-serif text-lg font-semibold text-creme mb-4">
               Nous trouver
@@ -65,8 +62,8 @@ export default function Footer() {
               </li>
               <li className="flex items-center gap-3 text-sm">
                 <Phone size={18} className="flex-shrink-0 text-dore" />
-                <a href="tel:" className="hover:text-dore transition-colors">
-                  —
+                <a href="tel:+33676772275" className="hover:text-dore transition-colors">
+                  06 76 77 22 75
                 </a>
               </li>
               <li className="flex items-start gap-3 text-sm">
@@ -76,7 +73,6 @@ export default function Footer() {
             </ul>
           </div>
 
-          {/* Réseaux & horaires */}
           <div>
             <h3 className="font-serif text-lg font-semibold text-creme mb-4">
               Suivez-nous
@@ -98,7 +94,6 @@ export default function Footer() {
           </div>
         </div>
 
-        {/* Barre de copyright */}
         <div className="mt-12 border-t border-creme/10 pt-8 text-center text-xs text-creme/40">
           <p>
             &copy; {new Date().getFullYear()} A Cas&apos;a Mina — Tous droits

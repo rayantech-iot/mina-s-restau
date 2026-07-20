@@ -11,30 +11,65 @@ import {
 import InstagramIcon from "@/components/InstagramIcon";
 import FadeIn from "@/components/FadeIn";
 import SectionTitle from "@/components/SectionTitle";
-import { getPlatImage, getGalerieImages } from "@/lib/images";
+import { useEffect, useState } from "react";
+import { createClient } from "@/lib/supabase/client";
 
-const featuredPlats = [
-  { id: "1", nom: "Poulet rôti à la broche", categorie: "Poulets rôtis", disponible: true, imgIdx: 0 },
-  { id: "2", nom: "Civet de sanglier", categorie: "Plats du jour", disponible: true, imgIdx: 4 },
-  { id: "3", nom: "Far breton aux pruneaux", categorie: "Desserts maison", disponible: true, imgIdx: 8 },
-  { id: "4", nom: "Courgettes farcies", categorie: "Plats du jour", disponible: false, imgIdx: 12 },
-];
+interface Plat {
+  id: string;
+  nom: string;
+  description: string | null;
+  image_url: string;
+  categorie_id: string | null;
+  statut: string;
+  mis_en_avant: boolean;
+}
 
-const instagramImages = getGalerieImages(6);
+interface Categorie {
+  id: string;
+  nom: string;
+}
 
 export default function Home() {
+  const [featuredPlats, setFeaturedPlats] = useState<Plat[]>([]);
+  const [categories, setCategories] = useState<Categorie[]>([]);
+  const [instagramImages, setInstagramImages] = useState<string[]>([]);
+
+  useEffect(() => {
+    const supabase = createClient();
+    supabase
+      .from("plats")
+      .select("*")
+      .eq("mis_en_avant", true)
+      .limit(4)
+      .then(({ data }) => setFeaturedPlats(data || []));
+
+    supabase
+      .from("categories")
+      .select("id, nom")
+      .then(({ data }) => setCategories(data || []));
+
+    supabase
+      .from("plats")
+      .select("image_url")
+      .not("image_url", "eq", "")
+      .limit(6)
+      .then(({ data }) =>
+        setInstagramImages((data || []).map((d) => d.image_url).filter(Boolean))
+      );
+  }, []);
+
+  const getCatName = (catId: string | null) =>
+    categories.find((c) => c.id === catId)?.nom || "";
+
   return (
     <>
       {/* Hero */}
       <section className="relative min-h-[85vh] flex items-center overflow-hidden bg-marine">
         <div className="absolute inset-0">
-          <Image
-            src={getPlatImage(0)}
-            alt="Poulet rôti à la broche"
-            fill
-            className="object-cover"
-            priority
-            sizes="100vw"
+          <img
+            src="/images/plats/plat-01.png"
+            alt="Poulet roti a la broche"
+            className="w-full h-full object-cover"
           />
           <div className="absolute inset-0 bg-marine/70" />
         </div>
@@ -47,15 +82,15 @@ export default function Home() {
                   Cuisine traditionnelle corse
                 </span>
                 <h1 className="font-serif text-4xl font-bold text-creme sm:text-5xl lg:text-6xl xl:text-7xl leading-tight">
-                  Poulets rôtis
+                  Poulets rotis
                   <br />
-                  <span className="text-dore">à la broche</span>
+                  <span className="text-dore">a la broche</span>
                   <br />
                   & plats faits maison
                 </h1>
                 <p className="mt-6 max-w-lg text-lg text-creme/70 mx-auto lg:mx-0">
-                  Entre Porto-Vecchio et Pinarello, savourez nos spécialités
-                  préparées avec des produits frais et le savoir-faire d&apos;une
+                  Entre Porto-Vecchio et Pinarello, savourez nos specialites
+                  preparees avec des produits frais et le savoir-faire d&apos;une
                   cuisine corse authentique.
                 </p>
                 <div className="mt-8 flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
@@ -80,13 +115,10 @@ export default function Home() {
             <FadeIn delay={0.2} className="hidden lg:block">
               <div className="relative">
                 <div className="relative aspect-square rounded-3xl overflow-hidden shadow-2xl">
-                  <Image
-                    src={getPlatImage(0)}
-                    alt="Poulet rôti à la broche"
-                    fill
-                    className="object-cover"
-                    sizes="500px"
-                    priority
+                  <img
+                    src="/images/plats/plat-01.png"
+                    alt="Poulet roti a la broche"
+                    className="w-full h-full object-cover"
                   />
                 </div>
                 <div className="absolute -bottom-6 -left-6 rounded-2xl bg-dore p-4 shadow-xl">
@@ -103,7 +135,7 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Bandeau disponibilité du jour */}
+      {/* Bandeau disponibilite */}
       <section className="bg-creme border-b border-border">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-4">
           <div className="flex flex-wrap items-center justify-center gap-3 text-center">
@@ -123,41 +155,52 @@ export default function Home() {
       <section className="py-16 lg:py-24">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <SectionTitle
-            title="Nos spécialités"
-            subtitle="Découvrez nos plats préparés quotidiennement avec des produits frais et locaux"
+            title="Nos specialties"
+            subtitle="Decouvrez nos plats prepares quotidiennement avec des produits frais et locaux"
           />
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-            {featuredPlats.map((plat, index) => (
-              <FadeIn key={plat.id} delay={index * 0.1}>
-                <Link href={`/carte/${plat.id}`} className="group block">
-                  <div className="relative overflow-hidden rounded-2xl bg-blanc shadow-md transition-all duration-300 hover:shadow-xl hover:-translate-y-1">
-                    <div className="aspect-square relative">
-                      <Image
-                        src={getPlatImage(plat.imgIdx)}
-                        alt={plat.nom}
-                        fill
-                        className="object-cover transition-transform duration-500 group-hover:scale-110"
-                        sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 25vw"
-                      />
-                    </div>
-                    <div className="p-4">
-                      <span className="text-xs font-medium text-dore uppercase tracking-wider">
-                        {plat.categorie}
-                      </span>
-                      <h3 className="mt-1 font-serif text-lg font-semibold text-marine group-hover:text-dore transition-colors">
-                        {plat.nom}
-                      </h3>
-                    </div>
-                    {plat.disponible && (
-                      <div className="absolute top-3 right-3 rounded-full bg-success/90 px-3 py-1 text-xs font-medium text-blanc">
-                        Disponible
+          {featuredPlats.length > 0 ? (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+              {featuredPlats.map((plat, index) => (
+                <FadeIn key={plat.id} delay={index * 0.1}>
+                  <Link href={`/carte/${plat.id}`} className="group block">
+                    <div className="relative overflow-hidden rounded-2xl bg-blanc shadow-md transition-all duration-300 hover:shadow-xl hover:-translate-y-1">
+                      <div className="aspect-square relative bg-border-light">
+                        {plat.image_url ? (
+                          <img
+                            src={plat.image_url}
+                            alt={plat.nom}
+                            className="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+                            loading="lazy"
+                          />
+                        ) : (
+                          <div className="absolute inset-0 flex items-center justify-center text-texte-lighter text-sm">
+                            Pas de photo
+                          </div>
+                        )}
                       </div>
-                    )}
-                  </div>
-                </Link>
-              </FadeIn>
-            ))}
-          </div>
+                      <div className="p-4">
+                        <span className="text-xs font-medium text-dore uppercase tracking-wider">
+                          {getCatName(plat.categorie_id)}
+                        </span>
+                        <h3 className="mt-1 font-serif text-lg font-semibold text-marine group-hover:text-dore transition-colors">
+                          {plat.nom}
+                        </h3>
+                      </div>
+                      {plat.statut === "disponible" && (
+                        <div className="absolute top-3 right-3 rounded-full bg-success/90 px-3 py-1 text-xs font-medium text-blanc">
+                          Disponible
+                        </div>
+                      )}
+                    </div>
+                  </Link>
+                </FadeIn>
+              ))}
+            </div>
+          ) : (
+            <div className="text-center py-12">
+              <p className="text-texte-light">Aucun plat mis en avant pour le moment.</p>
+            </div>
+          )}
           <div className="mt-10 text-center">
             <Link
               href="/carte"
@@ -177,17 +220,17 @@ export default function Home() {
             {[
               {
                 title: "Fait maison",
-                desc: "Chaque plat est préparé sur place avec des ingrédients frais, dans le respect de la tradition culinaire corse.",
+                desc: "Chaque plat est prepare sur place avec des ingredients frais, dans le respect de la tradition culinaire corse.",
                 icon: "🍳",
               },
               {
                 title: "Produits locaux",
-                desc: "Nous privilégions les producteurs corses et les circuits courts pour une qualité irréprochable.",
+                desc: "Nous privilegions les producteurs corses et les circuits courts pour une qualite irreprochable.",
                 icon: "🌿",
               },
               {
-                title: "À emporter",
-                desc: "Passez votre commande par téléphone ou sur place, et repartez avec des plats chauds et savoureux.",
+                title: "A emporter",
+                desc: "Passez votre commande par telephone ou sur place, et repartez avec des plats chauds et savoureux.",
                 icon: "📦",
               },
             ].map((item, index) => (
@@ -207,7 +250,7 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Événements */}
+      {/* Evenements */}
       <section className="py-16 lg:py-24">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="overflow-hidden rounded-3xl bg-blanc shadow-lg">
@@ -215,33 +258,31 @@ export default function Home() {
               <FadeIn>
                 <div className="p-8 lg:p-12">
                   <span className="text-sm font-medium text-dore uppercase tracking-wider">
-                    Événements
+                    Evenements
                   </span>
                   <h2 className="mt-3 font-serif text-3xl font-bold text-marine sm:text-4xl">
-                    Vous organisez un événement ?
+                    Vous organisez un evenement ?
                   </h2>
                   <p className="mt-4 text-texte-light leading-relaxed">
-                    Mariage, anniversaire, réunion de famille ou d&apos;entreprise
+                    Mariage, anniversaire, reunion de famille ou d&apos;entreprise
                     — nous proposons des formules sur mesure pour votre
-                    événement. Devis gratuit et sans engagement.
+                    evenement. Devis gratuit et sans engagement.
                   </p>
                   <Link
                     href="/evenements"
                     className="mt-6 inline-flex items-center gap-2 rounded-full bg-marine px-6 py-3 text-sm font-semibold text-creme transition-all hover:bg-marine-light"
                   >
-                    Découvrir nos offres
+                    Demander un devis
                     <ChevronRight size={18} />
                   </Link>
                 </div>
               </FadeIn>
               <FadeIn delay={0.1}>
                 <div className="relative min-h-[300px]">
-                  <Image
-                    src={getPlatImage(20)}
-                    alt="Événement - Commande groupée"
-                    fill
-                    className="object-cover"
-                    sizes="(max-width: 1024px) 100vw, 50vw"
+                  <img
+                    src="/images/plats/plat-20.png"
+                    alt="Evenement - Commande grouped"
+                    className="absolute inset-0 w-full h-full object-cover"
                   />
                 </div>
               </FadeIn>
@@ -250,102 +291,42 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Localisation */}
-      <section className="bg-blanc py-16 lg:py-24">
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-          <SectionTitle
-            title="Nous trouver"
-            subtitle="Entre Porto-Vecchio et Pinarello, au cœur de la Corse du Sud"
-          />
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-            <FadeIn>
-              <div className="rounded-2xl overflow-hidden shadow-lg h-[350px] lg:h-[450px] bg-border-light flex items-center justify-center">
-                <div className="text-center text-texte-light">
-                  <MapPin size={48} className="mx-auto text-marine/40 mb-4" />
-                  <p className="text-sm">Carte Google Maps</p>
-                  <p className="text-xs text-texte-lighter mt-1">
-                    Route de Cirendino, 20144 Zonza
-                  </p>
-                </div>
-              </div>
-            </FadeIn>
-            <FadeIn delay={0.1}>
-              <div className="flex flex-col justify-center space-y-6">
-                <div>
-                  <h3 className="font-serif text-xl font-bold text-marine">
-                    Adresse
-                  </h3>
-                  <p className="mt-2 text-texte-light">
-                    Route de Cirendino
-                    <br />
-                    20144 Sainte-Lucie de Porto-Vecchio
-                    <br />
-                    (entre Porto-Vecchio et Pinarello)
-                  </p>
-                </div>
-                <div>
-                  <h3 className="font-serif text-xl font-bold text-marine">
-                    Horaires
-                  </h3>
-                  <p className="mt-2 text-texte-light text-sm">
-                    Consultez notre page{" "}
-                    <Link
-                      href="/infos-pratiques"
-                      className="text-marine font-medium underline underline-offset-2 hover:text-dore"
-                    >
-                      Infos pratiques
-                    </Link>{" "}
-                    pour les horaires du jour.
-                  </p>
-                </div>
-                <Link
-                  href="/infos-pratiques"
-                  className="inline-flex items-center gap-2 self-start rounded-full bg-marine px-6 py-3 text-sm font-semibold text-creme transition-all hover:bg-marine-light"
-                >
-                  <MapPin size={18} />
-                  Voir sur Google Maps
-                </Link>
-              </div>
-            </FadeIn>
-          </div>
-        </div>
-      </section>
-
-      {/* Aperçu Instagram */}
+      {/* Apercu Instagram */}
       <section className="py-16 lg:py-24">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <SectionTitle
             title="Suivez-nous"
             subtitle="Retrouvez nos coulisses et nos plats du jour sur Instagram"
           />
-          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
-            {instagramImages.map((imgSrc, i) => (
-              <FadeIn key={i} delay={i * 0.05}>
-                <a
-                  href="https://instagram.com/acas_a_mina"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="group block aspect-square overflow-hidden rounded-xl"
-                >
-                  <div className="relative w-full h-full transition-transform duration-300 group-hover:scale-105">
-                    <Image
-                      src={imgSrc}
-                      alt={`Publication Instagram ${i + 1}`}
-                      fill
-                      className="object-cover"
-                      sizes="(max-width: 768px) 50vw, (max-width: 1200px) 33vw, 16vw"
-                    />
-                    <div className="absolute inset-0 bg-marine/0 transition-colors group-hover:bg-marine/30 flex items-center justify-center">
-                      <InstagramIcon
-                        size={28}
-                        className="text-blanc opacity-0 transition-all group-hover:opacity-100"
+          {instagramImages.length > 0 && (
+            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
+              {instagramImages.map((imgSrc, i) => (
+                <FadeIn key={i} delay={i * 0.05}>
+                  <a
+                    href="https://instagram.com/acas_a_mina"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="group block aspect-square overflow-hidden rounded-xl"
+                  >
+                    <div className="relative w-full h-full transition-transform duration-300 group-hover:scale-105">
+                      <img
+                        src={imgSrc}
+                        alt={`Publication Instagram ${i + 1}`}
+                        className="w-full h-full object-cover"
+                        loading="lazy"
                       />
+                      <div className="absolute inset-0 bg-marine/0 transition-colors group-hover:bg-marine/30 flex items-center justify-center">
+                        <InstagramIcon
+                          size={28}
+                          className="text-blanc opacity-0 transition-all group-hover:opacity-100"
+                        />
+                      </div>
                     </div>
-                  </div>
-                </a>
-              </FadeIn>
-            ))}
-          </div>
+                  </a>
+                </FadeIn>
+              ))}
+            </div>
+          )}
           <div className="mt-8 text-center">
             <a
               href="https://instagram.com/acas_a_mina"

@@ -1,25 +1,65 @@
-import type { Metadata } from "next";
+"use client";
+
+import { useState, useEffect } from "react";
 import SectionTitle from "@/components/SectionTitle";
 import FadeIn from "@/components/FadeIn";
 import { MapPin, Clock, Phone } from "lucide-react";
+import { createClient } from "@/lib/supabase/client";
 
-export const metadata: Metadata = {
-  title: "Infos pratiques",
-  description:
-    "Adresse, horaires et disponibilités du jour — A Cas'a Mina, Sainte-Lucie de Porto-Vecchio.",
+const defaultHoraires: Record<string, { ouverture: string; fermeture: string } | null> = {
+  lundi: { ouverture: "11:30", fermeture: "14:00" },
+  mardi: { ouverture: "11:30", fermeture: "14:00" },
+  mercredi: null,
+  jeudi: { ouverture: "11:30", fermeture: "14:00" },
+  vendredi: { ouverture: "11:30", fermeture: "14:00" },
+  samedi: { ouverture: "11:30", fermeture: "14:00" },
+  dimanche: null,
 };
 
-const horaires = [
-  { jour: "Lundi", horaires: "11h30 - 14h00" },
-  { jour: "Mardi", horaires: "11h30 - 14h00" },
-  { jour: "Mercredi", horaires: "Fermé" },
-  { jour: "Jeudi", horaires: "11h30 - 14h00" },
-  { jour: "Vendredi", horaires: "11h30 - 14h00" },
-  { jour: "Samedi", horaires: "11h30 - 14h00 / 18h30 - 21h00" },
-  { jour: "Dimanche", horaires: "Fermé" },
-];
+const jourLabels: Record<string, string> = {
+  lundi: "Lundi",
+  mardi: "Mardi",
+  mercredi: "Mercredi",
+  jeudi: "Jeudi",
+  vendredi: "Vendredi",
+  samedi: "Samedi",
+  dimanche: "Dimanche",
+};
 
 export default function InfosPratiquesPage() {
+  const [telephone, setTelephone] = useState("");
+  const [horaires, setHoraires] = useState(defaultHoraires);
+  const [adresse, setAdresse] = useState("Route de Cirendino\n20144 Sainte-Lucie de Porto-Vecchio");
+  const [googleMapsUrl, setGoogleMapsUrl] = useState("");
+  const supabase = createClient();
+
+  useEffect(() => {
+    supabase.from("reglages").select("*").limit(1).single().then(({ data }) => {
+      if (data) {
+        if (data.telephone) setTelephone(data.telephone);
+        if (data.horaires) setHoraires(data.horaires);
+        if (data.adresse) setAdresse(data.adresse);
+        if (data.google_maps_url) setGoogleMapsUrl(data.google_maps_url);
+      }
+    });
+  }, []);
+
+  const formatHoraire = (h: { ouverture: string; fermeture: string } | null) => {
+    if (!h) return "Ferme";
+    const formatTime = (t: string) => {
+      const [h2, m] = t.split(":");
+      return `${parseInt(h2)}h${m !== "00" ? m : ""}`;
+    };
+    return `${formatTime(h.ouverture)} - ${formatTime(h.fermeture)}`;
+  };
+
+  const defaultMapEmbed = "https://www.google.com/maps?q=Route+de+Cirendino,+20144+Sainte-Lucie+de+Porto-Vecchio,+France&output=embed";
+  const mapSrc = googleMapsUrl
+    ? googleMapsUrl.replace(/\/maps\/place\/.*$/, "").includes("google.com/maps")
+      ? googleMapsUrl.replace("maps?q=", "maps/embed?output=embed&q=")
+      : defaultMapEmbed
+    : defaultMapEmbed;
+
   return (
     <div className="py-12 lg:py-20">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
@@ -28,36 +68,22 @@ export default function InfosPratiquesPage() {
           subtitle="Tout ce qu&apos;il faut savoir pour nous retrouver"
         />
 
-        {/* Bandeau statut du jour */}
-        <FadeIn>
-          <div className="mb-12 rounded-2xl bg-blanc p-6 shadow-md">
-            <div className="flex flex-wrap items-center justify-center gap-4">
-              <div className="flex items-center gap-2 rounded-full bg-success/10 px-4 py-2 text-sm font-medium text-success">
-                <span className="h-2 w-2 rounded-full bg-success animate-pulse" />
-                Ouvert aujourd&apos;hui
-              </div>
-              <div className="flex items-center gap-2 rounded-full bg-dore/10 px-4 py-2 text-sm font-medium text-marine">
-                Poulet à la broche disponible
-              </div>
-            </div>
-          </div>
-        </FadeIn>
-
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-          {/* Carte */}
           <FadeIn>
-            <div className="rounded-2xl overflow-hidden shadow-lg h-[350px] lg:h-[450px] bg-border-light flex items-center justify-center">
-              <div className="text-center text-texte-light">
-                <MapPin size={48} className="mx-auto text-marine/40 mb-4" />
-                <p className="text-sm">Carte Google Maps</p>
-                <p className="text-xs text-texte-lighter mt-1">
-                  Route de Cirendino, 20144 Zonza
-                </p>
-              </div>
+            <div className="rounded-2xl overflow-hidden shadow-lg h-[350px] lg:h-[450px] bg-border-light">
+              <iframe
+                src={mapSrc}
+                width="100%"
+                height="100%"
+                style={{ border: 0 }}
+                allowFullScreen
+                loading="lazy"
+                referrerPolicy="no-referrer-when-downgrade"
+                title="Google Maps - A Cas'a Mina"
+              />
             </div>
           </FadeIn>
 
-          {/* Coordonnées */}
           <FadeIn delay={0.1}>
             <div className="space-y-8">
               <div>
@@ -65,32 +91,33 @@ export default function InfosPratiquesPage() {
                   <MapPin size={20} className="text-dore" />
                   Adresse
                 </h3>
-                <p className="mt-3 text-texte-light">
-                  Route de Cirendino
-                  <br />
-                  20144 Sainte-Lucie de Porto-Vecchio
-                  <br />
-                  (entre Porto-Vecchio et Pinarello)
+                <p className="mt-3 text-texte-light whitespace-pre-line">
+                  {adresse}
                 </p>
               </div>
 
               <div>
                 <h3 className="font-serif text-xl font-bold text-marine flex items-center gap-2">
                   <Phone size={20} className="text-dore" />
-                  Téléphone
+                  Telephone
                 </h3>
                 <a
-                  href="tel:"
+                  href={telephone ? `tel:${telephone.replace(/\s/g, "")}` : "tel:"}
                   className="mt-3 inline-block text-marine font-medium underline underline-offset-2 hover:text-dore"
                 >
-                  —
+                  {telephone || "06 76 77 22 75"}
                 </a>
+              </div>
+
+              <div className="rounded-xl bg-dore/10 p-4">
+                <p className="text-sm text-marine">
+                  Pensez à appeler pour vérifier la disponibilité du poulet à la broche avant de vous déplacer !
+                </p>
               </div>
             </div>
           </FadeIn>
         </div>
 
-        {/* Horaires */}
         <FadeIn>
           <div className="mt-12 rounded-2xl bg-blanc p-6 lg:p-8 shadow-md">
             <h3 className="font-serif text-2xl font-bold text-marine flex items-center gap-2 mb-6">
@@ -98,20 +125,18 @@ export default function InfosPratiquesPage() {
               Horaires d&apos;ouverture
             </h3>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-              {horaires.map((h) => (
+              {Object.entries(horaires).map(([jour, h]) => (
                 <div
-                  key={h.jour}
+                  key={jour}
                   className="flex items-center justify-between rounded-lg bg-creme px-4 py-3"
                 >
-                  <span className="font-medium text-texte">{h.jour}</span>
+                  <span className="font-medium text-texte">{jourLabels[jour]}</span>
                   <span
                     className={`text-sm ${
-                      h.horaires === "Fermé"
-                        ? "text-error font-medium"
-                        : "text-texte-light"
+                      !h ? "text-error font-medium" : "text-texte-light"
                     }`}
                   >
-                    {h.horaires}
+                    {formatHoraire(h)}
                   </span>
                 </div>
               ))}

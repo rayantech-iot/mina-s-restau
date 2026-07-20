@@ -1,14 +1,34 @@
 "use client";
 
-import { useState } from "react";
-import Image from "next/image";
+import { useState, useEffect } from "react";
 import { createClient } from "@/lib/supabase/client";
-import { Upload, Trash2, X } from "lucide-react";
+import { Upload, Trash2 } from "lucide-react";
+
+interface GalerieImage {
+  id: string;
+  url: string;
+  alt: string;
+  ordre: number;
+}
 
 export default function AdminGaleriePage() {
-  const [images, setImages] = useState<string[]>([]);
+  const [images, setImages] = useState<GalerieImage[]>([]);
   const [uploading, setUploading] = useState(false);
+  const [loading, setLoading] = useState(true);
   const supabase = createClient();
+
+  useEffect(() => {
+    loadImages();
+  }, []);
+
+  const loadImages = async () => {
+    const { data } = await supabase
+      .from("galerie_images")
+      .select("*")
+      .order("ordre", { ascending: true });
+    setImages(data || []);
+    setLoading(false);
+  };
 
   const handleUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files;
@@ -26,11 +46,27 @@ export default function AdminGaleriePage() {
         const { data } = supabase.storage
           .from("images")
           .getPublicUrl(filePath);
-        setImages((prev) => [data.publicUrl, ...prev]);
+
+        const maxOrdre = images.reduce((max, img) => Math.max(max, img.ordre), 0);
+        const { data: inserted } = await supabase
+          .from("galerie_images")
+          .insert({ url: data.publicUrl, alt: file.name.replace(/\.[^.]+$/, ""), ordre: maxOrdre + 1 })
+          .select()
+          .single();
+
+        if (inserted) {
+          setImages((prev) => [...prev, inserted]);
+        }
       }
     }
 
     setUploading(false);
+  };
+
+  const handleDelete = async (id: string) => {
+    if (!confirm("Supprimer cette image de la galerie ?")) return;
+    await supabase.from("galerie_images").delete().eq("id", id);
+    setImages(images.filter((img) => img.id !== id));
   };
 
   return (
@@ -51,32 +87,36 @@ export default function AdminGaleriePage() {
       </div>
 
       <p className="text-sm text-texte-light mb-6">
-        Ajoutez des photos à la galerie générale du site. Les images seront
-        visibles dans la section Galerie du site public.
+        Ajoutez des photos à la galerie. Les plats de la carte apparaissent aussi automatiquement dans la galerie publique.
       </p>
 
-      {images.length === 0 ? (
+      {loading ? (
+        <div className="text-center py-16 text-texte-light">Chargement...</div>
+      ) : images.length === 0 ? (
         <div className="text-center py-16 rounded-2xl bg-blanc shadow-sm">
           <Upload size={40} className="mx-auto text-texte-lighter mb-3" />
           <p className="text-texte-light">
-            Aucune image. Ajoutez des photos pour commencer.
+            Aucune image supplementaire. Ajoutez des photos pour commencer.
           </p>
         </div>
       ) : (
         <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3">
-          {images.map((src, i) => (
+          {images.map((img) => (
             <div
-              key={i}
+              key={img.id}
               className="group relative aspect-square rounded-xl overflow-hidden bg-border-light"
             >
-              <Image
-                src={src}
-                alt={`Galerie ${i + 1}`}
-                fill
-                className="object-cover"
+              <img
+                src={img.url}
+                alt={img.alt}
+                className="w-full h-full object-cover"
+                loading="lazy"
               />
               <div className="absolute inset-0 bg-black/0 group-hover:bg-black/40 transition-colors flex items-center justify-center opacity-0 group-hover:opacity-100">
-                <button className="rounded-full bg-error p-2 text-blanc hover:bg-error/80 transition-colors">
+                <button
+                  onClick={() => handleDelete(img.id)}
+                  className="rounded-full bg-error p-2 text-blanc hover:bg-error/80 transition-colors"
+                >
                   <Trash2 size={16} />
                 </button>
               </div>

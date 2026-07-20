@@ -3,7 +3,6 @@ import Image from "next/image";
 import Link from "next/link";
 import SectionTitle from "@/components/SectionTitle";
 import FadeIn from "@/components/FadeIn";
-import { getPlatImage } from "@/lib/images";
 
 export const metadata: Metadata = {
   title: "À propos",
@@ -22,10 +21,10 @@ export default function AProposPage() {
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
           <FadeIn>
-            <div className="relative rounded-3xl overflow-hidden shadow-xl aspect-[4/3]">
+            <div className="relative rounded-3xl overflow-hidden shadow-xl aspect-[3/4] max-h-[600px] mx-auto">
               <Image
-                src={getPlatImage(60)}
-                alt="A Cas'a Mina - Le lieu"
+                src="/images/galerie/mina.png"
+                alt="Mina - A Cas'a Mina"
                 fill
                 className="object-cover"
                 sizes="(max-width: 1024px) 100vw, 50vw"
@@ -72,12 +71,20 @@ export default function AProposPage() {
                 </p>
               </div>
 
-              <Link
-                href="/contact"
-                className="inline-flex items-center rounded-full bg-marine px-6 py-3 text-sm font-semibold text-creme transition-all hover:bg-marine-light"
-              >
-                Nous contacter
-              </Link>
+              <div className="flex flex-col sm:flex-row gap-4 pt-2">
+                <Link
+                  href="/contact"
+                  className="inline-flex items-center justify-center rounded-full bg-marine px-6 py-3 text-sm font-semibold text-creme transition-all hover:bg-marine-light"
+                >
+                  Nous contacter
+                </Link>
+                <Link
+                  href="/evenements"
+                  className="inline-flex items-center justify-center rounded-full border-2 border-marine px-6 py-3 text-sm font-semibold text-marine transition-all hover:bg-marine hover:text-creme"
+                >
+                  Demander un devis
+                </Link>
+              </div>
             </div>
           </FadeIn>
         </div>
