@@ -26,7 +26,6 @@ interface Plat {
 }
 
 export default function CartePage() {
-  const [activeFilter, setActiveFilter] = useState("Tous");
   const [categories, setCategories] = useState<Categorie[]>([]);
   const [plats, setPlats] = useState<Plat[]>([]);
   const [loading, setLoading] = useState(true);
@@ -46,15 +45,7 @@ export default function CartePage() {
     setLoading(false);
   };
 
-  const catNames = ["Tous", ...categories.map((c) => c.nom)];
-
-  const filtered =
-    activeFilter === "Tous"
-      ? plats
-      : plats.filter((p) => {
-          const cat = categories.find((c) => c.id === p.categorie_id);
-          return cat?.nom === activeFilter;
-        });
+  const filtered = plats;
 
   return (
     <div className="py-12 lg:py-20">
@@ -65,20 +56,10 @@ export default function CartePage() {
         />
 
         <FadeIn>
-          <div className="mb-10 flex flex-wrap justify-center gap-2">
-            {catNames.map((cat) => (
-              <button
-                key={cat}
-                onClick={() => setActiveFilter(cat)}
-                className={`rounded-full px-4 py-2 text-sm font-medium transition-all ${
-                  activeFilter === cat
-                    ? "bg-marine text-creme"
-                    : "bg-blanc text-texte-light border border-border hover:border-marine hover:text-marine"
-                }`}
-              >
-                {cat}
-              </button>
-            ))}
+          <div className="mb-10 text-center">
+            <p className="text-sm text-texte-light">
+              {filtered.length} plat{filtered.length > 1 ? "s" : ""} disponible{filtered.length > 1 ? "s" : ""}
+            </p>
           </div>
         </FadeIn>
 
