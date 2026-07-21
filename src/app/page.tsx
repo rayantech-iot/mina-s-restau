@@ -56,78 +56,53 @@ export default function Home() {
   return (
     <>
       {/* Hero */}
-      <section className="relative min-h-[90vh] flex items-center overflow-hidden bg-marine">
+      <section className="relative min-h-[100vh] flex items-end overflow-hidden">
         <div className="absolute inset-0">
           <img
             src="/images/plats/Poulets%20r%C3%B4tis%2C%20galettes%20de%20l%C3%A9gumes%20de%20saison.png"
             alt="Poulet roti a la broche"
             className="w-full h-full object-cover"
           />
-          <div className="absolute inset-0 bg-gradient-to-b from-marine/80 via-marine/60 to-marine/90" />
+          <div className="absolute inset-0 bg-gradient-to-t from-marine via-marine/40 to-transparent" />
         </div>
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_50%,rgba(212,175,55,0.12),transparent_50%)]" />
 
-        <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-20 w-full">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
-            <FadeIn>
-              <div className="text-center lg:text-left">
-                <span className="inline-block rounded-full bg-dore/20 px-4 py-1.5 text-sm font-medium text-dore mb-6">
-                  Cuisine traditionnelle corse
-                </span>
-                <h1 className="font-serif text-4xl font-bold text-creme sm:text-5xl lg:text-6xl xl:text-7xl leading-tight">
-                  Poulets rotis
-                  <br />
-                  <span className="text-dore">a la broche</span>
-                  <br />
-                  & plats faits maison
-                </h1>
-                <p className="mt-6 max-w-lg text-lg text-creme/70 mx-auto lg:mx-0">
-                  Entre Porto-Vecchio et Pinarello, savourez nos specialites
-                  preparees avec des produits frais et le savoir-faire d&apos;une
-                  cuisine corse authentique.
-                </p>
-                <div className="mt-8 flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
-                  <a
-                    href={`tel:${telephone}`}
-                    className="inline-flex items-center justify-center gap-2 rounded-full bg-dore px-8 py-3.5 text-sm font-semibold text-marine transition-all hover:bg-dore-light hover:scale-105"
-                  >
-                    <Phone size={18} />
-                    Commander au {telephone.replace(/(\d{2})(\d{2})(\d{2})(\d{2})(\d{2})/, "$1 $2 $3 $4 $5")}
-                  </a>
-                  <Link
-                    href="/carte"
-                    className="inline-flex items-center justify-center gap-2 rounded-full border border-creme/30 px-8 py-3.5 text-sm font-semibold text-creme transition-all hover:border-creme/60 hover:bg-creme/10"
-                  >
-                    Voir nos plats
-                  </Link>
-                </div>
+        <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 pb-20 lg:pb-28 pt-40 w-full">
+          <FadeIn>
+            <div className="max-w-2xl">
+              <span className="inline-block rounded-full bg-dore/20 px-4 py-1.5 text-xs font-semibold text-dore uppercase tracking-widest mb-6">
+                Sainte-Lucie de Porto-Vecchio
+              </span>
+              <h1 className="font-serif text-5xl font-bold text-creme sm:text-6xl lg:text-7xl leading-[1.05]">
+                Poulets rotis
+                <span className="block text-dore">a la broche</span>
+              </h1>
+              <p className="mt-6 max-w-md text-lg text-creme/70 leading-relaxed">
+                Plats faits maison, produits frais, tradition corse.
+                <br />
+                A emporter, pour vos repas quotidiens et vos evenements.
+              </p>
+              <div className="mt-8 flex flex-col sm:flex-row gap-3">
+                <a
+                  href={`tel:${telephone}`}
+                  className="inline-flex items-center justify-center gap-2 rounded-full bg-dore px-7 py-3.5 text-sm font-bold text-marine transition-all hover:bg-dore-light hover:scale-105"
+                >
+                  <Phone size={18} />
+                  {telephone.replace(/(\d{2})(\d{2})(\d{2})(\d{2})(\d{2})/, "$1 $2 $3 $4 $5")}
+                </a>
+                <Link
+                  href="/carte"
+                  className="inline-flex items-center justify-center gap-2 rounded-full border border-creme/30 px-7 py-3.5 text-sm font-semibold text-creme transition-all hover:border-creme/60 hover:bg-creme/10"
+                >
+                  Decouvrir la carte
+                </Link>
               </div>
-            </FadeIn>
+            </div>
+          </FadeIn>
+        </div>
 
-            <FadeIn delay={0.2} className="hidden lg:block">
-              <div className="relative">
-                <div className="relative aspect-[4/5] rounded-3xl overflow-hidden shadow-2xl">
-                  <img
-                    src="/images/plats/Poulets%20r%C3%B4tis%2C%20galettes%20de%20l%C3%A9gumes%20de%20saison.png"
-                    alt="Poulet roti a la broche"
-                    className="w-full h-full object-cover"
-                  />
-                </div>
-                <div className="absolute -bottom-6 -left-6 rounded-2xl bg-dore p-4 shadow-xl">
-                  <p className="font-serif text-lg font-bold text-marine">
-                    Fait maison
-                  </p>
-                  <p className="text-sm text-marine/70">
-                    avec amour
-                  </p>
-                </div>
-                <div className="absolute -top-4 -right-4 rounded-2xl bg-blanc p-3 shadow-xl">
-                  <p className="font-serif text-sm font-bold text-marine">
-                    A emporter
-                  </p>
-                </div>
-              </div>
-            </FadeIn>
+        <div className="absolute bottom-6 left-1/2 -translate-x-1/2 animate-bounce">
+          <div className="w-6 h-10 rounded-full border-2 border-creme/40 flex items-start justify-center p-1.5">
+            <div className="w-1.5 h-3 rounded-full bg-creme/60" />
           </div>
         </div>
       </section>

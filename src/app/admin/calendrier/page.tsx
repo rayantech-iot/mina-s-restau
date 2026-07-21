@@ -2,11 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
-import {
-  ChevronLeft,
-  ChevronRight,
-  X,
-} from "lucide-react";
+import { ChevronLeft, ChevronRight, X, CheckSquare, Square } from "lucide-react";
 
 interface Disponibilite {
   id?: string;
@@ -28,13 +24,13 @@ export default function AdminCalendrierPage() {
   const supabase = createClient();
   const [currentMonth, setCurrentMonth] = useState(new Date());
   const [dispos, setDispos] = useState<Record<string, Disponibilite>>({});
-  const [selected, setSelected] = useState<string | null>(null);
-  const [editData, setEditData] = useState<Disponibilite>({
-    date: "",
+  const [selectedDates, setSelectedDates] = useState<Set<string>>(new Set());
+  const [bulkEdit, setBulkEdit] = useState(false);
+  const [bulkData, setBulkData] = useState({
     statut_ouverture: "ouvert",
     broche_disponible: false,
     reserve_evenement: false,
-    note: null,
+    note: "",
   });
 
   const year = currentMonth.getFullYear();
@@ -71,77 +67,128 @@ export default function AdminCalendrierPage() {
   };
 
   const { adjustedStart, daysInMonth } = getDaysInMonth();
-
-  const openEditor = (dateStr: string) => {
-    setSelected(dateStr);
-    const existing = dispos[dateStr];
-    setEditData(
-      existing || {
-        date: dateStr,
-        statut_ouverture: "ouvert",
-        broche_disponible: false,
-        reserve_evenement: false,
-        note: null,
-      }
-    );
-  };
-
-  const saveDay = async () => {
-    if (!selected) return;
-    const existing = dispos[selected];
-
-    if (existing?.id) {
-      await supabase
-        .from("disponibilites")
-        .update(editData)
-        .eq("id", existing.id);
-    } else {
-      await supabase.from("disponibilites").insert(editData);
-    }
-
-    await loadDispos();
-    setSelected(null);
-  };
-
   const today = new Date().toISOString().split("T")[0];
+
+  const toggleDate = (dateStr: string) => {
+    setSelectedDates((prev) => {
+      const next = new Set(prev);
+      if (next.has(dateStr)) {
+        next.delete(dateStr);
+      } else {
+        next.add(dateStr);
+      }
+      return next;
+    });
+  };
+
+  const selectAllDays = () => {
+    const all: string[] = [];
+    for (let i = 1; i <= daysInMonth; i++) {
+      all.push(`${year}-${String(month + 1).padStart(2, "0")}-${String(i).padStart(2, "0")}`);
+    }
+    setSelectedDates(new Set(all));
+  };
+
+  const clearSelection = () => {
+    setSelectedDates(new Set());
+    setBulkEdit(false);
+  };
+
+  const applyBulk = async () => {
+    if (selectedDates.size === 0) return;
+
+    for (const dateStr of selectedDates) {
+      const existing = dispos[dateStr];
+      const payload = {
+        date: dateStr,
+        statut_ouverture: bulkData.statut_ouverture,
+        broche_disponible: bulkData.broche_disponible,
+        reserve_evenement: bulkData.reserve_evenement,
+        note: bulkData.note || null,
+      };
+
+      if (existing?.id) {
+        await supabase.from("disponibilites").update(payload).eq("id", existing.id);
+      } else {
+        await supabase.from("disponibilites").insert(payload);
+      }
+    }
+    await loadDispos();
+    clearSelection();
+  };
+
+  const handleDayClick = (dateStr: string) => {
+    if (selectedDates.size > 0) {
+      toggleDate(dateStr);
+    } else {
+      toggleDate(dateStr);
+    }
+  };
+
+  const handleDayDoubleClick = (dateStr: string) => {
+    setSelectedDates(new Set([dateStr]));
+    setBulkEdit(true);
+  };
 
   return (
     <div>
-      <h1 className="font-serif text-3xl font-bold text-marine mb-8">
-        Calendrier
-      </h1>
+      <div className="flex items-center justify-between mb-8">
+        <h1 className="font-serif text-3xl font-bold text-marine">Calendrier</h1>
+        {selectedDates.size > 0 && (
+          <div className="flex items-center gap-2">
+            <span className="text-sm text-texte-light">{selectedDates.size} jour{selectedDates.size > 1 ? "s" : ""} sélectionné{selectedDates.size > 1 ? "s" : ""}</span>
+            <button
+              onClick={() => setBulkEdit(!bulkEdit)}
+              className="inline-flex items-center gap-2 rounded-full bg-marine px-4 py-2 text-sm font-semibold text-creme transition-all hover:bg-marine-light"
+            >
+              Modifier
+            </button>
+            <button
+              onClick={clearSelection}
+              className="rounded-full border border-border px-3 py-2 text-sm text-texte-light hover:border-marine hover:text-marine transition-all"
+            >
+              Annuler
+            </button>
+          </div>
+        )}
+      </div>
+
+      {selectedDates.size === 0 && (
+        <p className="text-sm text-texte-light mb-6">
+          Appuyez sur un jour pour le sélectionner. Double-cliquez pour modifier directement.
+        </p>
+      )}
 
       <div className="rounded-2xl bg-blanc p-6 shadow-sm">
-        {/* Navigation mois */}
         <div className="flex items-center justify-between mb-6">
           <button
-            onClick={() =>
-              setCurrentMonth(new Date(year, month - 1, 1))
-            }
+            onClick={() => setCurrentMonth(new Date(year, month - 1, 1))}
             className="rounded-lg p-2 text-texte-light hover:bg-marine/10 hover:text-marine transition-colors"
           >
             <ChevronLeft size={20} />
           </button>
-          <h2 className="font-serif text-xl font-bold text-marine">
-            {MONTHS_FR[month]} {year}
-          </h2>
+          <div className="flex items-center gap-3">
+            <h2 className="font-serif text-xl font-bold text-marine">
+              {MONTHS_FR[month]} {year}
+            </h2>
+            <button
+              onClick={selectAllDays}
+              className="text-xs text-marine hover:text-dore transition-colors underline"
+            >
+              Tout sélectionner
+            </button>
+          </div>
           <button
-            onClick={() =>
-              setCurrentMonth(new Date(year, month + 1, 1))
-            }
+            onClick={() => setCurrentMonth(new Date(year, month + 1, 1))}
             className="rounded-lg p-2 text-texte-light hover:bg-marine/10 hover:text-marine transition-colors"
           >
             <ChevronRight size={20} />
           </button>
         </div>
 
-        {/* Grille */}
         <div className="grid grid-cols-7 gap-1">
           {DAYS.map((day) => (
-            <div
-              key={day}
-              className="text-center text-xs font-medium text-texte-lighter py-2"
-            >
+            <div key={day} className="text-center text-xs font-medium text-texte-lighter py-2">
               {day}
             </div>
           ))}
@@ -155,23 +202,22 @@ export default function AdminCalendrierPage() {
             const dateStr = `${year}-${String(month + 1).padStart(2, "0")}-${String(day).padStart(2, "0")}`;
             const d = dispos[dateStr];
             const isToday = dateStr === today;
-            const isSelected = dateStr === selected;
+            const isSelected = selectedDates.has(dateStr);
 
             return (
               <button
                 key={day}
-                onClick={() => openEditor(dateStr)}
+                onClick={() => handleDayClick(dateStr)}
+                onDoubleClick={() => handleDayDoubleClick(dateStr)}
                 className={`relative rounded-lg p-2 min-h-[60px] text-left text-xs transition-all ${
                   isSelected
-                    ? "ring-2 ring-marine bg-marine/5"
+                    ? "ring-2 ring-marine bg-marine/10"
                     : "hover:bg-creme"
                 } ${isToday ? "ring-1 ring-dore" : ""}`}
               >
                 <span
                   className={`font-medium ${
-                    d?.statut_ouverture === "ferme"
-                      ? "text-error"
-                      : "text-texte"
+                    d?.statut_ouverture === "ferme" ? "text-error" : "text-texte"
                   }`}
                 >
                   {day}
@@ -196,7 +242,6 @@ export default function AdminCalendrierPage() {
           })}
         </div>
 
-        {/* Légende */}
         <div className="mt-4 flex flex-wrap gap-4 text-xs text-texte-lighter">
           <div className="flex items-center gap-1.5">
             <span className="h-2 w-2 rounded-full bg-success" />
@@ -217,20 +262,16 @@ export default function AdminCalendrierPage() {
         </div>
       </div>
 
-      {/* Éditeur jour */}
-      {selected && (
+      {/* Bulk editor */}
+      {bulkEdit && selectedDates.size > 0 && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
           <div className="w-full max-w-md rounded-2xl bg-blanc p-6 shadow-xl">
             <div className="flex items-center justify-between mb-6">
               <h3 className="font-serif text-lg font-bold text-marine">
-                {new Date(selected + "T12:00:00").toLocaleDateString("fr-FR", {
-                  weekday: "long",
-                  day: "numeric",
-                  month: "long",
-                })}
+                Modifier {selectedDates.size} jour{selectedDates.size > 1 ? "s" : ""}
               </h3>
               <button
-                onClick={() => setSelected(null)}
+                onClick={() => setBulkEdit(false)}
                 className="rounded-lg p-1 text-texte-lighter hover:text-texte"
               >
                 <X size={20} />
@@ -245,11 +286,9 @@ export default function AdminCalendrierPage() {
                 <div className="flex gap-2">
                   <button
                     type="button"
-                    onClick={() =>
-                      setEditData({ ...editData, statut_ouverture: "ouvert" })
-                    }
+                    onClick={() => setBulkData({ ...bulkData, statut_ouverture: "ouvert" })}
                     className={`flex-1 rounded-lg py-2 text-sm font-medium transition-all ${
-                      editData.statut_ouverture === "ouvert"
+                      bulkData.statut_ouverture === "ouvert"
                         ? "bg-success text-blanc"
                         : "bg-creme text-texte-light border border-border"
                     }`}
@@ -258,11 +297,9 @@ export default function AdminCalendrierPage() {
                   </button>
                   <button
                     type="button"
-                    onClick={() =>
-                      setEditData({ ...editData, statut_ouverture: "ferme" })
-                    }
+                    onClick={() => setBulkData({ ...bulkData, statut_ouverture: "ferme" })}
                     className={`flex-1 rounded-lg py-2 text-sm font-medium transition-all ${
-                      editData.statut_ouverture === "ferme"
+                      bulkData.statut_ouverture === "ferme"
                         ? "bg-error text-blanc"
                         : "bg-creme text-texte-light border border-border"
                     }`}
@@ -275,21 +312,14 @@ export default function AdminCalendrierPage() {
               <label className="flex items-center gap-3 cursor-pointer">
                 <button
                   type="button"
-                  onClick={() =>
-                    setEditData({
-                      ...editData,
-                      broche_disponible: !editData.broche_disponible,
-                    })
-                  }
+                  onClick={() => setBulkData({ ...bulkData, broche_disponible: !bulkData.broche_disponible })}
                   className={`h-5 w-9 rounded-full transition-colors ${
-                    editData.broche_disponible ? "bg-dore" : "bg-border"
+                    bulkData.broche_disponible ? "bg-dore" : "bg-border"
                   }`}
                 >
                   <span
                     className={`block h-4 w-4 rounded-full bg-blanc shadow transition-transform ${
-                      editData.broche_disponible
-                        ? "translate-x-4"
-                        : "translate-x-0.5"
+                      bulkData.broche_disponible ? "translate-x-4" : "translate-x-0.5"
                     }`}
                   />
                 </button>
@@ -299,27 +329,18 @@ export default function AdminCalendrierPage() {
               <label className="flex items-center gap-3 cursor-pointer">
                 <button
                   type="button"
-                  onClick={() =>
-                    setEditData({
-                      ...editData,
-                      reserve_evenement: !editData.reserve_evenement,
-                    })
-                  }
+                  onClick={() => setBulkData({ ...bulkData, reserve_evenement: !bulkData.reserve_evenement })}
                   className={`h-5 w-9 rounded-full transition-colors ${
-                    editData.reserve_evenement ? "bg-marine" : "bg-border"
+                    bulkData.reserve_evenement ? "bg-marine" : "bg-border"
                   }`}
                 >
                   <span
                     className={`block h-4 w-4 rounded-full bg-blanc shadow transition-transform ${
-                      editData.reserve_evenement
-                        ? "translate-x-4"
-                        : "translate-x-0.5"
+                      bulkData.reserve_evenement ? "translate-x-4" : "translate-x-0.5"
                     }`}
                   />
                 </button>
-                <span className="text-sm text-texte">
-                  Réservé pour un événement
-                </span>
+                <span className="text-sm text-texte">Réservé pour un événement</span>
               </label>
 
               <div>
@@ -328,14 +349,9 @@ export default function AdminCalendrierPage() {
                 </label>
                 <input
                   type="text"
-                  value={editData.note || ""}
-                  onChange={(e) =>
-                    setEditData({
-                      ...editData,
-                      note: e.target.value || null,
-                    })
-                  }
-                  placeholder="Ex: Plat du jour : civet de sanglier"
+                  value={bulkData.note}
+                  onChange={(e) => setBulkData({ ...bulkData, note: e.target.value })}
+                  placeholder="Ex: Fermé pour rénovation"
                   className="w-full rounded-lg border border-border bg-creme px-4 py-3 text-sm text-texte focus:border-marine focus:ring-2 focus:ring-marine/20 outline-none transition-all"
                 />
               </div>
@@ -343,13 +359,13 @@ export default function AdminCalendrierPage() {
 
             <div className="mt-6 flex gap-3">
               <button
-                onClick={saveDay}
+                onClick={applyBulk}
                 className="flex-1 rounded-full bg-marine py-3 text-sm font-semibold text-creme transition-all hover:bg-marine-light"
               >
-                Enregistrer
+                Appliquer à {selectedDates.size} jour{selectedDates.size > 1 ? "s" : ""}
               </button>
               <button
-                onClick={() => setSelected(null)}
+                onClick={() => setBulkEdit(false)}
                 className="rounded-full border border-border px-6 py-3 text-sm font-medium text-texte-light transition-all hover:border-marine hover:text-marine"
               >
                 Annuler

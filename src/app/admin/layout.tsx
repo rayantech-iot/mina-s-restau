@@ -54,7 +54,7 @@ export default function AdminLayout({
   }
 
   return (
-    <div className="flex min-h-[calc(100vh-64px)] lg:min-h-[calc(100vh-80px)]">
+    <div className="flex min-h-screen">
       {/* Mobile toggle */}
       <button
         onClick={() => setSidebarOpen(!sidebarOpen)}
@@ -78,7 +78,7 @@ export default function AdminLayout({
 
       {/* Sidebar */}
       <aside
-        className={`fixed top-16 lg:top-20 bottom-0 z-40 w-64 bg-marine overflow-y-auto transition-transform duration-300 lg:translate-x-0 ${
+        className={`fixed top-0 bottom-0 z-40 w-64 bg-marine overflow-y-auto transition-transform duration-300 lg:translate-x-0 ${
           sidebarOpen ? "translate-x-0" : "-translate-x-full"
         }`}
       >
@@ -87,9 +87,9 @@ export default function AdminLayout({
             <Image
               src="/images/galerie/logo.jpg"
               alt="A Cas'a Mina"
-              width={140}
-              height={48}
-              className="h-10 w-auto"
+              width={200}
+              height={70}
+              className="h-14 w-auto"
             />
           </div>
 

@@ -112,14 +112,13 @@ export default function AdminGaleriePage() {
                 className="w-full h-full object-cover"
                 loading="lazy"
               />
-              <div className="absolute inset-0 bg-black/0 group-hover:bg-black/40 transition-colors flex items-center justify-center opacity-0 group-hover:opacity-100">
-                <button
-                  onClick={() => handleDelete(img.id)}
-                  className="rounded-full bg-error p-2 text-blanc hover:bg-error/80 transition-colors"
-                >
-                  <Trash2 size={16} />
-                </button>
-              </div>
+              <div className="absolute inset-0 bg-black/0 group-hover:bg-black/40 transition-colors" />
+              <button
+                onClick={() => handleDelete(img.id)}
+                className="absolute top-2 right-2 z-10 rounded-full bg-error p-2 text-blanc hover:bg-error/80 transition-colors shadow-lg sm:opacity-0 sm:group-hover:opacity-100"
+              >
+                <Trash2 size={16} />
+              </button>
             </div>
           ))}
         </div>
