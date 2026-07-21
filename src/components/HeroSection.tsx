@@ -25,7 +25,7 @@ const heroConfig = {
   subtitle: "Le goût de l'authentique, le plaisir du partage.",
   description:
     "Cuisine corse et française, faite maison avec des produits de qualité, pour accompagner vos mariages, anniversaires, événements privés et professionnels.",
-  image: "/images/premiere-section-accueil.webp",
+  image: "/images/galerie/premiere-section-accueil.png",
   ctaPrimary: { label: "Découvrir la carte", href: "/carte" },
   ctaSecondary: { label: "Nos réalisations", href: "/galerie" },
 };
