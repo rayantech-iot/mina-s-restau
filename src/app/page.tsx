@@ -207,8 +207,7 @@ export default function Home() {
                   <img
                     src="/images/plats/Riz sauté aux légumes moules et gambas.png"
                     alt="Evenement - Commande groupee"
-                    className="absolute inset-0 w-full h-[120%] object-cover"
-                    data-parallax
+                    className="absolute top-0 left-0 w-full h-full object-cover"
                   />
                 </div>
               </FadeIn>
