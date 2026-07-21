@@ -205,7 +205,7 @@ export default function Home() {
               <FadeIn delay={0.1}>
                 <div className="relative min-h-[300px] overflow-hidden">
                   <img
-                    src="/images/plats/Saut%C3%A9%20de%20veau%20aux%20olives.png"
+                    src="/images/plats/Riz sauté aux légumes moules et gambas.png"
                     alt="Evenement - Commande groupee"
                     className="absolute inset-0 w-full h-[120%] object-cover"
                     data-parallax
