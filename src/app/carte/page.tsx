@@ -56,9 +56,23 @@ export default function CartePage() {
         />
 
         <FadeIn>
-          <div className="mb-10 text-center">
-            <p className="text-sm text-texte-light">
-              {filtered.length} plat{filtered.length > 1 ? "s" : ""} disponible{filtered.length > 1 ? "s" : ""}
+          <div className="mb-10 text-center max-w-2xl mx-auto">
+            <p className="text-texte-light leading-relaxed">
+              Voici quelques-uns de nos plats. Nous en réalisons bien d&apos;autres !
+              <a
+                href="tel:+33676772275"
+                className="ml-1 font-semibold text-marine underline underline-offset-2 hover:text-dore transition-colors"
+              >
+                Contactez-nous
+              </a>{" "}
+              pour connaître toutes nos disponibilités ou{" "}
+              <Link
+                href="/evenements"
+                className="font-semibold text-marine underline underline-offset-2 hover:text-dore transition-colors"
+              >
+                demandez un devis
+              </Link>{" "}
+              pour votre événement.
             </p>
           </div>
         </FadeIn>

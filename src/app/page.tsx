@@ -1,13 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import Image from "next/image";
-import {
-  MapPin,
-  ChevronRight,
-  UtensilsCrossed,
-  Clock,
-} from "lucide-react";
+import { Phone } from "lucide-react";
 import InstagramIcon from "@/components/InstagramIcon";
 import FadeIn from "@/components/FadeIn";
 import SectionTitle from "@/components/SectionTitle";
@@ -24,18 +18,15 @@ interface Plat {
   mis_en_avant: boolean;
 }
 
-interface Categorie {
-  id: string;
-  nom: string;
-}
 
 export default function Home() {
   const [featuredPlats, setFeaturedPlats] = useState<Plat[]>([]);
-  const [categories, setCategories] = useState<Categorie[]>([]);
-  const [instagramImages, setInstagramImages] = useState<string[]>([]);
+  const [recentImages, setRecentImages] = useState<{ src: string; alt: string }[]>([]);
+  const [telephone, setTelephone] = useState("0676772275");
 
   useEffect(() => {
     const supabase = createClient();
+
     supabase
       .from("plats")
       .select("*")
@@ -44,37 +35,39 @@ export default function Home() {
       .then(({ data }) => setFeaturedPlats(data || []));
 
     supabase
-      .from("categories")
-      .select("id, nom")
-      .then(({ data }) => setCategories(data || []));
+      .from("reglages")
+      .select("telephone")
+      .limit(1)
+      .single()
+      .then(({ data }) => {
+        if (data?.telephone) setTelephone(data.telephone.replace(/\s/g, ""));
+      });
 
     supabase
-      .from("plats")
-      .select("image_url")
-      .not("image_url", "eq", "")
-      .limit(6)
-      .then(({ data }) =>
-        setInstagramImages((data || []).map((d) => d.image_url).filter(Boolean))
-      );
+      .from("galerie_images")
+      .select("url, alt")
+      .order("created_at", { ascending: false })
+      .limit(8)
+      .then(({ data }) => {
+        setRecentImages((data || []).map((g) => ({ src: g.url, alt: g.alt })));
+      });
   }, []);
-
-  const getCatName = (catId: string | null) =>
-    categories.find((c) => c.id === catId)?.nom || "";
 
   return (
     <>
       {/* Hero */}
-      <section className="relative min-h-[85vh] flex items-center overflow-hidden bg-marine">
+      <section className="relative min-h-[90vh] flex items-center overflow-hidden bg-marine">
         <div className="absolute inset-0">
           <img
-            src="/images/plats/plat-01.png"
+            src="/images/plats/Poulets%20r%C3%B4tis%2C%20galettes%20de%20l%C3%A9gumes%20de%20saison.png"
             alt="Poulet roti a la broche"
             className="w-full h-full object-cover"
           />
-          <div className="absolute inset-0 bg-marine/70" />
+          <div className="absolute inset-0 bg-gradient-to-b from-marine/80 via-marine/60 to-marine/90" />
         </div>
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_50%,rgba(212,175,55,0.15),transparent_50%)]" />
-        <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-20">
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_50%,rgba(212,175,55,0.12),transparent_50%)]" />
+
+        <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-20 w-full">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
             <FadeIn>
               <div className="text-center lg:text-left">
@@ -94,19 +87,18 @@ export default function Home() {
                   cuisine corse authentique.
                 </p>
                 <div className="mt-8 flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
-                  <Link
-                    href="/carte"
+                  <a
+                    href={`tel:${telephone}`}
                     className="inline-flex items-center justify-center gap-2 rounded-full bg-dore px-8 py-3.5 text-sm font-semibold text-marine transition-all hover:bg-dore-light hover:scale-105"
                   >
-                    <UtensilsCrossed size={18} />
-                    Voir la carte
-                  </Link>
+                    <Phone size={18} />
+                    Commander au {telephone.replace(/(\d{2})(\d{2})(\d{2})(\d{2})(\d{2})/, "$1 $2 $3 $4 $5")}
+                  </a>
                   <Link
-                    href="/infos-pratiques"
+                    href="/carte"
                     className="inline-flex items-center justify-center gap-2 rounded-full border border-creme/30 px-8 py-3.5 text-sm font-semibold text-creme transition-all hover:border-creme/60 hover:bg-creme/10"
                   >
-                    <MapPin size={18} />
-                    Nous trouver
+                    Voir nos plats
                   </Link>
                 </div>
               </div>
@@ -114,9 +106,9 @@ export default function Home() {
 
             <FadeIn delay={0.2} className="hidden lg:block">
               <div className="relative">
-                <div className="relative aspect-square rounded-3xl overflow-hidden shadow-2xl">
+                <div className="relative aspect-[4/5] rounded-3xl overflow-hidden shadow-2xl">
                   <img
-                    src="/images/plats/plat-01.png"
+                    src="/images/plats/Poulets%20r%C3%B4tis%2C%20galettes%20de%20l%C3%A9gumes%20de%20saison.png"
                     alt="Poulet roti a la broche"
                     className="w-full h-full object-cover"
                   />
@@ -129,24 +121,29 @@ export default function Home() {
                     avec amour
                   </p>
                 </div>
+                <div className="absolute -top-4 -right-4 rounded-2xl bg-blanc p-3 shadow-xl">
+                  <p className="font-serif text-sm font-bold text-marine">
+                    A emporter
+                  </p>
+                </div>
               </div>
             </FadeIn>
           </div>
         </div>
       </section>
 
-      {/* Bandeau disponibilite */}
+      {/* Bandeau */}
       <section className="bg-creme border-b border-border">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-4">
           <div className="flex flex-wrap items-center justify-center gap-3 text-center">
-            <div className="flex items-center gap-2 rounded-full bg-success/10 px-4 py-2 text-sm font-medium text-success">
-              <span className="h-2 w-2 rounded-full bg-success animate-pulse" />
-              Ouvert aujourd&apos;hui
-            </div>
-            <div className="flex items-center gap-2 rounded-full bg-dore/10 px-4 py-2 text-sm font-medium text-marine">
-              <Clock size={16} className="text-dore" />
-              Broche disponible
-            </div>
+            <a
+              href={`tel:${telephone}`}
+              className="inline-flex items-center gap-2 rounded-full bg-dore/10 px-4 py-2 text-sm font-medium text-marine transition-colors hover:bg-dore/20"
+            >
+              <Phone size={16} className="text-dore" />
+              Appelez-nous pour commander
+            </a>
+            <span className="text-texte-lighter text-sm">Route de Cirendino, Sainte-Lucie de Porto-Vecchio</span>
           </div>
         </div>
       </section>
@@ -159,7 +156,7 @@ export default function Home() {
             subtitle="Decouvrez nos plats prepares quotidiennement avec des produits frais et locaux"
           />
           {featuredPlats.length > 0 ? (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-6">
               {featuredPlats.map((plat, index) => (
                 <FadeIn key={plat.id} delay={index * 0.1}>
                   <Link href={`/carte/${plat.id}`} className="group block">
@@ -178,19 +175,11 @@ export default function Home() {
                           </div>
                         )}
                       </div>
-                      <div className="p-4">
-                        <span className="text-xs font-medium text-dore uppercase tracking-wider">
-                          {getCatName(plat.categorie_id)}
-                        </span>
-                        <h3 className="mt-1 font-serif text-lg font-semibold text-marine group-hover:text-dore transition-colors">
+                      <div className="p-2 sm:p-4">
+                        <h3 className="font-serif text-sm sm:text-lg font-semibold text-marine group-hover:text-dore transition-colors">
                           {plat.nom}
                         </h3>
                       </div>
-                      {plat.statut === "disponible" && (
-                        <div className="absolute top-3 right-3 rounded-full bg-success/90 px-3 py-1 text-xs font-medium text-blanc">
-                          Disponible
-                        </div>
-                      )}
                     </div>
                   </Link>
                 </FadeIn>
@@ -198,7 +187,7 @@ export default function Home() {
             </div>
           ) : (
             <div className="text-center py-12">
-              <p className="text-texte-light">Aucun plat mis en avant pour le moment.</p>
+              <p className="text-texte-light">Nos specialties arrivent bientot.</p>
             </div>
           )}
           <div className="mt-10 text-center">
@@ -207,7 +196,6 @@ export default function Home() {
               className="inline-flex items-center gap-2 rounded-full border-2 border-marine px-8 py-3 text-sm font-semibold text-marine transition-all hover:bg-marine hover:text-creme"
             >
               Voir toute la carte
-              <ChevronRight size={18} />
             </Link>
           </div>
         </div>
@@ -216,7 +204,12 @@ export default function Home() {
       {/* Bloc valeurs */}
       <section className="bg-marine py-16 lg:py-24">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 lg:gap-12">
+          <SectionTitle
+            title="Notre philosophie"
+            subtitle="Une cuisine honnete, preparee avec passion"
+            light
+          />
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 lg:gap-12 mt-12">
             {[
               {
                 title: "Fait maison",
@@ -240,7 +233,7 @@ export default function Home() {
                   <h3 className="mt-4 font-serif text-xl font-bold text-creme">
                     {item.title}
                   </h3>
-                  <p className="mt-3 text-creme/60 text-sm leading-relaxed">
+                  <p className="mt-3 text-creme/60 text-sm leading-relaxed max-w-xs mx-auto">
                     {item.desc}
                   </p>
                 </div>
@@ -250,8 +243,45 @@ export default function Home() {
         </div>
       </section>
 
+      {/* Galerie apercu */}
+      {recentImages.length > 0 && (
+        <section className="py-16 lg:py-24">
+          <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+            <SectionTitle
+              title="Nos creations"
+              subtitle="Un apercu de nos plats et coulisses"
+            />
+            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3">
+              {recentImages.map((img, i) => (
+                <FadeIn key={i} delay={i * 0.05}>
+                  <a
+                    href="/galerie"
+                    className="group block aspect-square overflow-hidden rounded-xl bg-border-light"
+                  >
+                    <img
+                      src={img.src}
+                      alt={img.alt}
+                      className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+                      loading="lazy"
+                    />
+                  </a>
+                </FadeIn>
+              ))}
+            </div>
+            <div className="mt-8 text-center">
+              <Link
+                href="/galerie"
+                className="inline-flex items-center gap-2 rounded-full border-2 border-marine px-6 py-2.5 text-sm font-semibold text-marine transition-all hover:bg-marine hover:text-creme"
+              >
+                Voir la galerie
+              </Link>
+            </div>
+          </div>
+        </section>
+      )}
+
       {/* Evenements */}
-      <section className="py-16 lg:py-24">
+      <section className="py-16 lg:py-24 bg-creme">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="overflow-hidden rounded-3xl bg-blanc shadow-lg">
             <div className="grid grid-cols-1 lg:grid-cols-2">
@@ -273,15 +303,14 @@ export default function Home() {
                     className="mt-6 inline-flex items-center gap-2 rounded-full bg-marine px-6 py-3 text-sm font-semibold text-creme transition-all hover:bg-marine-light"
                   >
                     Demander un devis
-                    <ChevronRight size={18} />
                   </Link>
                 </div>
               </FadeIn>
               <FadeIn delay={0.1}>
                 <div className="relative min-h-[300px]">
                   <img
-                    src="/images/plats/plat-20.png"
-                    alt="Evenement - Commande grouped"
+                    src="/images/plats/Saut%C3%A9%20de%20veau%20aux%20olives.png"
+                    alt="Evenement - Commande groupee"
                     className="absolute inset-0 w-full h-full object-cover"
                   />
                 </div>
@@ -298,35 +327,6 @@ export default function Home() {
             title="Suivez-nous"
             subtitle="Retrouvez nos coulisses et nos plats du jour sur Instagram"
           />
-          {instagramImages.length > 0 && (
-            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
-              {instagramImages.map((imgSrc, i) => (
-                <FadeIn key={i} delay={i * 0.05}>
-                  <a
-                    href="https://instagram.com/acas_a_mina"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="group block aspect-square overflow-hidden rounded-xl"
-                  >
-                    <div className="relative w-full h-full transition-transform duration-300 group-hover:scale-105">
-                      <img
-                        src={imgSrc}
-                        alt={`Publication Instagram ${i + 1}`}
-                        className="w-full h-full object-cover"
-                        loading="lazy"
-                      />
-                      <div className="absolute inset-0 bg-marine/0 transition-colors group-hover:bg-marine/30 flex items-center justify-center">
-                        <InstagramIcon
-                          size={28}
-                          className="text-blanc opacity-0 transition-all group-hover:opacity-100"
-                        />
-                      </div>
-                    </div>
-                  </a>
-                </FadeIn>
-              ))}
-            </div>
-          )}
           <div className="mt-8 text-center">
             <a
               href="https://instagram.com/acas_a_mina"
