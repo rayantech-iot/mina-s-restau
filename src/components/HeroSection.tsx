@@ -108,7 +108,7 @@ export default function HeroSection() {
                 alt="A Cas'a Mina"
                 width={140}
                 height={56}
-                className="h-[80px] w-auto lg:h-[90px]"
+                className="h-[80px] w-auto lg:h-[90px] rounded-full"
                 priority
               />
             </Link>
