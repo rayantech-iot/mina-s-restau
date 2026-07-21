@@ -67,7 +67,7 @@ export default function HeroSection() {
   return (
     <section className="relative h-screen w-full overflow-hidden bg-creme">
       {/* ===== PHOTO DROITE 60% ===== */}
-      <div className="absolute inset-0 lg:right-0 lg:top-0 lg:bottom-0 lg:w-[60%]">
+      <div className="absolute inset-0 lg:left-auto lg:right-0 lg:top-0 lg:bottom-0 lg:w-[60%]">
         <motion.div
           initial={{ scale: 1.08, opacity: 0 }}
           animate={{ scale: 1, opacity: 1 }}
