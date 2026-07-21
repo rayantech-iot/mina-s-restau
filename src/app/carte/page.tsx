@@ -67,7 +67,7 @@ export default function CartePage() {
           <div className="text-center py-16 text-texte-light">Chargement...</div>
         ) : (
           <>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+            <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 sm:gap-6">
               {filtered.map((plat, index) => (
                 <FadeIn key={plat.id} delay={index * 0.05}>
                   <Link href={`/carte/${plat.id}`} className="group block">
@@ -86,11 +86,11 @@ export default function CartePage() {
                           </div>
                         )}
                       </div>
-                      <div className="p-4">
+                      <div className="p-2 sm:p-4">
                         <span className="text-xs font-medium text-dore uppercase tracking-wider">
                           {categories.find((c) => c.id === plat.categorie_id)?.nom || ""}
                         </span>
-                        <h3 className="mt-1 font-serif text-lg font-semibold text-marine group-hover:text-dore transition-colors">
+                        <h3 className="mt-1 font-serif text-sm sm:text-lg font-semibold text-marine group-hover:text-dore transition-colors">
                           {plat.nom}
                         </h3>
                         {plat.description && (
