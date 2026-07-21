@@ -5,6 +5,7 @@ import InstagramIcon from "@/components/InstagramIcon";
 import FadeIn from "@/components/FadeIn";
 import SectionTitle from "@/components/SectionTitle";
 import HeroSection from "@/components/HeroSection";
+import ScrollAnimations from "@/components/ScrollAnimations";
 import { useEffect, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
 
@@ -44,11 +45,12 @@ export default function Home() {
 
   return (
     <>
+      <ScrollAnimations />
       <HeroSection />
 
       {/* Plats mis en avant */}
-      <section className="py-16 lg:py-24">
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+      <section className="py-16 lg:py-24" data-animate>
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8" data-animate-child>
           <SectionTitle
             title="Nos specialties"
             subtitle="Decouvrez nos plats prepares quotidiennement avec des produits frais et locaux"
@@ -100,8 +102,8 @@ export default function Home() {
       </section>
 
       {/* Bloc valeurs */}
-      <section className="bg-marine py-16 lg:py-24">
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+      <section className="bg-marine py-16 lg:py-24" data-animate>
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8" data-animate-child>
           <SectionTitle
             title="Notre philosophie"
             subtitle="Une cuisine honnete, preparee avec passion"
@@ -139,8 +141,8 @@ export default function Home() {
 
       {/* Galerie apercu */}
       {recentImages.length > 0 && (
-        <section className="py-16 lg:py-24">
-          <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+        <section className="py-16 lg:py-24" data-animate>
+          <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8" data-animate-child>
             <SectionTitle
               title="Nos creations"
               subtitle="Un apercu de nos plats et coulisses"
@@ -175,8 +177,8 @@ export default function Home() {
       )}
 
       {/* Evenements */}
-      <section className="py-16 lg:py-24 bg-creme">
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+      <section className="py-16 lg:py-24 bg-creme" data-animate>
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8" data-animate-child>
           <div className="overflow-hidden rounded-3xl bg-blanc shadow-lg">
             <div className="grid grid-cols-1 lg:grid-cols-2">
               <FadeIn>
@@ -201,11 +203,12 @@ export default function Home() {
                 </div>
               </FadeIn>
               <FadeIn delay={0.1}>
-                <div className="relative min-h-[300px]">
+                <div className="relative min-h-[300px] overflow-hidden">
                   <img
                     src="/images/plats/Saut%C3%A9%20de%20veau%20aux%20olives.png"
                     alt="Evenement - Commande groupee"
-                    className="absolute inset-0 w-full h-full object-cover"
+                    className="absolute inset-0 w-full h-[120%] object-cover"
+                    data-parallax
                   />
                 </div>
               </FadeIn>
@@ -215,8 +218,8 @@ export default function Home() {
       </section>
 
       {/* Apercu Instagram */}
-      <section className="py-16 lg:py-24">
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+      <section className="py-16 lg:py-24" data-animate>
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8" data-animate-child>
           <SectionTitle
             title="Suivez-nous"
             subtitle="Retrouvez nos coulisses et nos plats du jour sur Instagram"
