@@ -112,26 +112,22 @@ export default function Home() {
               {
                 title: "Fait maison",
                 desc: "Chaque plat est prepare sur place avec des ingredients frais, dans le respect de la tradition culinaire corse.",
-                icon: "🍳",
               },
               {
                 title: "Produits locaux",
                 desc: "Nous privilegions les producteurs corses et les circuits courts pour une qualite irreprochable.",
-                icon: "🌿",
               },
               {
                 title: "A emporter",
                 desc: "Passez votre commande par telephone ou sur place, et repartez avec des plats chauds et savoureux.",
-                icon: "📦",
               },
             ].map((item, index) => (
               <FadeIn key={index} delay={index * 0.15}>
                 <div className="text-center">
-                  <span className="text-4xl">{item.icon}</span>
-                  <h3 className="mt-4 font-serif text-xl font-bold text-creme">
+                  <h3 className="font-serif text-xl font-bold text-creme">
                     {item.title}
                   </h3>
-                  <p className="mt-3 text-creme/60 text-sm leading-relaxed max-w-xs mx-auto">
+                  <p className="mt-3 text-creme/80 text-sm leading-relaxed max-w-xs mx-auto">
                     {item.desc}
                   </p>
                 </div>

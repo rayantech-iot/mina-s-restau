@@ -5,7 +5,7 @@ import InstagramIcon from "@/components/InstagramIcon";
 
 export default function Footer() {
   return (
-    <footer className="bg-marine text-creme/80">
+    <footer className="bg-marine text-creme/90">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-12 lg:py-16">
         <div className="grid grid-cols-1 gap-10 md:grid-cols-2 lg:grid-cols-4">
           <div className="lg:col-span-1">
@@ -16,7 +16,7 @@ export default function Footer() {
               height={56}
               className="h-14 w-auto mb-4 rounded"
             />
-            <p className="text-sm leading-relaxed text-creme/60">
+            <p className="text-sm leading-relaxed text-creme/75">
               Restaurant à emporter en Corse. Poulets rôtis à la broche et plats
               faits maison, préparés avec amour entre Porto-Vecchio et Pinarello.
             </p>
@@ -86,7 +86,7 @@ export default function Footer() {
               <InstagramIcon size={18} />
               @acas_a_mina
             </a>
-            <p className="mt-6 text-xs text-creme/40">
+            <p className="mt-6 text-xs text-creme/55">
               Route de Cirendino, Sainte-Lucie de Porto-Vecchio
               <br />
               Entre Porto-Vecchio et Pinarello
@@ -94,7 +94,7 @@ export default function Footer() {
           </div>
         </div>
 
-        <div className="mt-12 border-t border-creme/10 pt-8 text-center text-xs text-creme/40">
+        <div className="mt-12 border-t border-creme/10 pt-8 text-center text-xs text-creme/55">
           <p>
             &copy; {new Date().getFullYear()} A Cas&apos;a Mina — Tous droits
             réservés
