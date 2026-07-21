@@ -100,7 +100,7 @@ export default function Home() {
       </section>
 
       {/* Bloc valeurs */}
-      <section className="bg-marine py-16 lg:py-24">
+      <section className="bg-marine/90 py-16 lg:py-24">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <SectionTitle
             title="Notre philosophie"
