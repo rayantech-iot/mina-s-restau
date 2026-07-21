@@ -8,6 +8,7 @@ import { Menu, X, Phone } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
 
 const navLinks = [
+  { href: "/", label: "Accueil" },
   { href: "/carte", label: "La Carte" },
   { href: "/a-propos", label: "À propos" },
   { href: "/infos-pratiques", label: "Infos pratiques" },
