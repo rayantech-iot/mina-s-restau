@@ -8,13 +8,13 @@ import Link from "next/link";
 import { createClient } from "@/lib/supabase/client";
 
 const defaultHoraires: Record<string, { ouverture: string; fermeture: string; ouverture2?: string; fermeture2?: string } | null> = {
-  lundi: { ouverture: "11:30", fermeture: "14:00", ouverture2: "18:30", fermeture2: "21:00" },
-  mardi: { ouverture: "11:30", fermeture: "14:00", ouverture2: "18:30", fermeture2: "21:00" },
-  mercredi: null,
-  jeudi: { ouverture: "11:30", fermeture: "14:00", ouverture2: "18:30", fermeture2: "21:00" },
-  vendredi: { ouverture: "11:30", fermeture: "14:00", ouverture2: "18:30", fermeture2: "21:00" },
-  samedi: { ouverture: "11:30", fermeture: "14:00", ouverture2: "18:30", fermeture2: "21:00" },
-  dimanche: null,
+  lundi: { ouverture: "08:00", fermeture: "13:30", ouverture2: "17:00", fermeture2: "20:30" },
+  mardi: { ouverture: "08:00", fermeture: "13:30", ouverture2: "17:00", fermeture2: "20:30" },
+  mercredi: { ouverture: "08:00", fermeture: "13:30", ouverture2: "17:00", fermeture2: "20:30" },
+  jeudi: { ouverture: "08:00", fermeture: "13:30", ouverture2: "17:00", fermeture2: "20:30" },
+  vendredi: { ouverture: "08:00", fermeture: "13:30", ouverture2: "17:00", fermeture2: "20:30" },
+  samedi: { ouverture: "08:00", fermeture: "13:30", ouverture2: "17:00", fermeture2: "20:30" },
+  dimanche: { ouverture: "08:00", fermeture: "13:30", ouverture2: "17:00", fermeture2: "20:30" },
 };
 
 const jourLabels: Record<string, string> = {
@@ -30,7 +30,7 @@ const jourLabels: Record<string, string> = {
 export default function InfosPratiquesPage() {
   const [telephone, setTelephone] = useState("");
   const [horaires, setHoraires] = useState(defaultHoraires);
-  const [adresse, setAdresse] = useState("Route de Cirendino\n20144 Sainte-Lucie de Porto-Vecchio");
+  const [adresse, setAdresse] = useState("Route de Cirindinu, 20144 Sainte-Lucie-de-Porto-Vecchio");
   const [googleMapsUrl, setGoogleMapsUrl] = useState("");
   const supabase = createClient();
 
@@ -59,7 +59,7 @@ export default function InfosPratiquesPage() {
     return period1;
   };
 
-  const defaultMapEmbed = "https://www.google.com/maps?q=Route+de+Cirendino+20144+Sainte-Lucie+de+Porto-Vecchio+Corse&output=embed&z=14";
+  const defaultMapEmbed = "https://www.google.com/maps?q=41.659103,9.362065&output=embed&z=14";
   const mapSrc = googleMapsUrl && googleMapsUrl.includes("google.com/maps")
     ? googleMapsUrl.includes("embed")
       ? googleMapsUrl

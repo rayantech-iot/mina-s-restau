@@ -5,13 +5,13 @@ import { createClient } from "@/lib/supabase/client";
 import { Save, Mail } from "lucide-react";
 
 const defaultHoraires: Record<string, { ouverture: string; fermeture: string; ouverture2?: string; fermeture2?: string } | null> = {
-  lundi: { ouverture: "11:30", fermeture: "14:00", ouverture2: "18:30", fermeture2: "21:00" },
-  mardi: { ouverture: "11:30", fermeture: "14:00", ouverture2: "18:30", fermeture2: "21:00" },
-  mercredi: null,
-  jeudi: { ouverture: "11:30", fermeture: "14:00", ouverture2: "18:30", fermeture2: "21:00" },
-  vendredi: { ouverture: "11:30", fermeture: "14:00", ouverture2: "18:30", fermeture2: "21:00" },
-  samedi: { ouverture: "11:30", fermeture: "14:00", ouverture2: "18:30", fermeture2: "21:00" },
-  dimanche: null,
+  lundi: { ouverture: "08:00", fermeture: "13:30", ouverture2: "17:00", fermeture2: "20:30" },
+  mardi: { ouverture: "08:00", fermeture: "13:30", ouverture2: "17:00", fermeture2: "20:30" },
+  mercredi: { ouverture: "08:00", fermeture: "13:30", ouverture2: "17:00", fermeture2: "20:30" },
+  jeudi: { ouverture: "08:00", fermeture: "13:30", ouverture2: "17:00", fermeture2: "20:30" },
+  vendredi: { ouverture: "08:00", fermeture: "13:30", ouverture2: "17:00", fermeture2: "20:30" },
+  samedi: { ouverture: "08:00", fermeture: "13:30", ouverture2: "17:00", fermeture2: "20:30" },
+  dimanche: { ouverture: "08:00", fermeture: "13:30", ouverture2: "17:00", fermeture2: "20:30" },
 };
 
 export default function AdminReglagesPage() {
@@ -99,14 +99,14 @@ export default function AdminReglagesPage() {
       ...prev,
       [jour]: prev[jour]
         ? { ...prev[jour]!, [field]: value }
-        : { ouverture: "11:30", fermeture: "14:00", [field]: value },
+        : { ouverture: "08:00", fermeture: "13:30", [field]: value },
     }));
   };
 
   const toggleJour = (jour: string) => {
     setHoraires((prev) => ({
       ...prev,
-      [jour]: prev[jour] ? null : { ouverture: "11:30", fermeture: "14:00", ouverture2: "", fermeture2: "" },
+      [jour]: prev[jour] ? null : { ouverture: "08:00", fermeture: "13:30", ouverture2: "17:00", fermeture2: "20:30" },
     }));
   };
 
