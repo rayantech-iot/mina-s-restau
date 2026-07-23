@@ -52,13 +52,20 @@ export default function Footer() {
               Nous trouver
             </h3>
             <ul className="space-y-3">
-              <li className="flex items-start gap-3 text-sm">
-                <MapPin size={18} className="mt-0.5 flex-shrink-0 text-dore" />
-                <span>
-                  Route de Cirendino
-                  <br />
-                  20144 Sainte-Lucie de Porto-Vecchio
-                </span>
+              <li>
+                <a
+                  href="https://maps.app.goo.gl/qgCZXYrSYWUUJPp3A"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-start gap-3 text-sm hover:text-dore transition-colors"
+                >
+                  <MapPin size={18} className="mt-0.5 flex-shrink-0 text-dore" />
+                  <span>
+                    Route de Cirindinu
+                    <br />
+                    20144 Sainte-Lucie-de-Porto-Vecchio
+                  </span>
+                </a>
               </li>
               <li className="flex items-center gap-3 text-sm">
                 <Phone size={18} className="flex-shrink-0 text-dore" />
@@ -87,7 +94,7 @@ export default function Footer() {
               @acas_a_mina
             </a>
             <p className="mt-6 text-xs text-creme/55">
-              Route de Cirendino, Sainte-Lucie de Porto-Vecchio
+              Route de Cirindinu, Sainte-Lucie-de-Porto-Vecchio
               <br />
               Entre Porto-Vecchio et Pinarello
             </p>
