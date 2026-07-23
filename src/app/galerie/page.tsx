@@ -20,9 +20,12 @@ interface PlatImage {
   nom: string;
 }
 
+const PAGE_SIZE = 12;
+
 export default function GaleriePage() {
   const [lightbox, setLightbox] = useState<number | null>(null);
   const [allImages, setAllImages] = useState<{ id: string; src: string; alt: string }[]>([]);
+  const [visibleCount, setVisibleCount] = useState(PAGE_SIZE);
   const [loading, setLoading] = useState(true);
   const supabase = createClient();
 
@@ -54,6 +57,9 @@ export default function GaleriePage() {
     setLoading(false);
   };
 
+  const visibleImages = allImages.slice(0, visibleCount);
+  const hasMore = visibleCount < allImages.length;
+
   const openLightbox = useCallback((index: number) => setLightbox(index), []);
   const closeLightbox = useCallback(() => setLightbox(null), []);
 
@@ -77,18 +83,18 @@ export default function GaleriePage() {
           <div className="text-center py-16 text-texte-light">Chargement...</div>
         ) : (
           <>
-            <p className="text-center text-sm text-texte-lighter mb-6">
+            <p className="text-center text-sm text-texte-lighter mb-8">
               {allImages.length} photo{allImages.length > 1 ? "s" : ""}
             </p>
 
             <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3">
-              {allImages.map((photo) => (
+              {visibleImages.map((photo, index) => (
                 <motion.button
                   key={photo.id}
                   initial={{ opacity: 0, scale: 0.95 }}
                   animate={{ opacity: 1, scale: 1 }}
-                  transition={{ duration: 0.3 }}
-                  onClick={() => openLightbox(allImages.indexOf(photo))}
+                  transition={{ duration: 0.3, delay: index >= visibleCount - PAGE_SIZE ? (index - (visibleCount - PAGE_SIZE)) * 0.05 : 0 }}
+                  onClick={() => openLightbox(index)}
                   className="group relative aspect-square focus:outline-none focus:ring-2 focus:ring-marine rounded-xl overflow-hidden bg-border-light"
                 >
                   <img
@@ -101,6 +107,17 @@ export default function GaleriePage() {
                 </motion.button>
               ))}
             </div>
+
+            {hasMore && (
+              <div className="mt-10 text-center">
+                <button
+                  onClick={() => setVisibleCount((prev) => prev + PAGE_SIZE)}
+                  className="inline-flex items-center gap-2 rounded-full border-2 border-marine px-8 py-3 text-sm font-semibold text-marine transition-all hover:bg-marine hover:text-creme"
+                >
+                  Voir plus ({allImages.length - visibleCount} restante{allImages.length - visibleCount > 1 ? "s" : ""})
+                </button>
+              </div>
+            )}
           </>
         )}
       </div>
@@ -125,6 +142,7 @@ export default function GaleriePage() {
         </FadeIn>
       </div>
 
+      {/* Lightbox */}
       <AnimatePresence>
         {lightbox !== null && allImages[lightbox] && (
           <motion.div
