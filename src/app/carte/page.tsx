@@ -7,6 +7,7 @@ import SectionTitle from "@/components/SectionTitle";
 import FadeIn from "@/components/FadeIn";
 import InstagramIcon from "@/components/InstagramIcon";
 import { createClient } from "@/lib/supabase/client";
+import DisponibiliteBanner from "@/components/DisponibiliteBanner";
 
 interface Categorie {
   id: string;
@@ -76,6 +77,10 @@ export default function CartePage() {
             </p>
           </div>
         </FadeIn>
+
+        <div className="max-w-xs mx-auto mb-8">
+          <DisponibiliteBanner />
+        </div>
 
         {loading ? (
           <div className="text-center py-16 text-texte-light">Chargement...</div>
