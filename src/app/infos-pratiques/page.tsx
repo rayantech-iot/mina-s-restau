@@ -59,11 +59,11 @@ export default function InfosPratiquesPage() {
     return period1;
   };
 
-  const defaultMapEmbed = "https://www.google.com/maps?q=41.659103,9.362065&output=embed&z=14";
+  const defaultMapEmbed = "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3229.7!2d9.3619012!3d41.6599612!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x12d985b0d121ee01%3A0x341015c291f43cf2!2sA%20Cas%27a%20Mina!5e0!3m2!1sfr!2sfr!4v1";
   const mapSrc = googleMapsUrl && googleMapsUrl.includes("google.com/maps")
     ? googleMapsUrl.includes("embed")
       ? googleMapsUrl
-      : googleMapsUrl + "&output=embed"
+      : defaultMapEmbed
     : defaultMapEmbed;
 
   return (
@@ -76,7 +76,7 @@ export default function InfosPratiquesPage() {
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
           <FadeIn>
-            <div className="rounded-2xl overflow-hidden shadow-lg h-[350px] lg:h-[450px] bg-border-light">
+            <div className="rounded-2xl overflow-hidden shadow-lg h-[350px] lg:h-[450px] bg-border-light relative">
               <iframe
                 src={mapSrc}
                 width="100%"
@@ -87,6 +87,17 @@ export default function InfosPratiquesPage() {
                 referrerPolicy="no-referrer-when-downgrade"
                 title="Google Maps - A Cas'a Mina"
               />
+              {googleMapsUrl && (
+                <a
+                  href={googleMapsUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="absolute bottom-3 right-3 inline-flex items-center gap-1.5 rounded-full bg-blanc px-3 py-1.5 text-xs font-medium text-marine shadow-md hover:bg-marine hover:text-creme transition-all"
+                >
+                  <MapPin size={12} />
+                  Ouvrir dans Google Maps
+                </a>
+              )}
             </div>
           </FadeIn>
 
