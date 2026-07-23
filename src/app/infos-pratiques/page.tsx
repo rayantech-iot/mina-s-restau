@@ -7,13 +7,13 @@ import { MapPin, Clock, Phone } from "lucide-react";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/client";
 
-const defaultHoraires: Record<string, { ouverture: string; fermeture: string } | null> = {
-  lundi: { ouverture: "11:30", fermeture: "14:00" },
-  mardi: { ouverture: "11:30", fermeture: "14:00" },
+const defaultHoraires: Record<string, { ouverture: string; fermeture: string; ouverture2?: string; fermeture2?: string } | null> = {
+  lundi: { ouverture: "11:30", fermeture: "14:00", ouverture2: "18:30", fermeture2: "21:00" },
+  mardi: { ouverture: "11:30", fermeture: "14:00", ouverture2: "18:30", fermeture2: "21:00" },
   mercredi: null,
-  jeudi: { ouverture: "11:30", fermeture: "14:00" },
-  vendredi: { ouverture: "11:30", fermeture: "14:00" },
-  samedi: { ouverture: "11:30", fermeture: "14:00" },
+  jeudi: { ouverture: "11:30", fermeture: "14:00", ouverture2: "18:30", fermeture2: "21:00" },
+  vendredi: { ouverture: "11:30", fermeture: "14:00", ouverture2: "18:30", fermeture2: "21:00" },
+  samedi: { ouverture: "11:30", fermeture: "14:00", ouverture2: "18:30", fermeture2: "21:00" },
   dimanche: null,
 };
 
@@ -45,13 +45,18 @@ export default function InfosPratiquesPage() {
     });
   }, []);
 
-  const formatHoraire = (h: { ouverture: string; fermeture: string } | null) => {
+  const formatTime = (t: string) => {
+    const [h, m] = t.split(":");
+    return `${parseInt(h)}h${m !== "00" ? m : ""}`;
+  };
+
+  const formatHoraire = (h: { ouverture: string; fermeture: string; ouverture2?: string; fermeture2?: string } | null) => {
     if (!h) return "Ferme";
-    const formatTime = (t: string) => {
-      const [h2, m] = t.split(":");
-      return `${parseInt(h2)}h${m !== "00" ? m : ""}`;
-    };
-    return `${formatTime(h.ouverture)} - ${formatTime(h.fermeture)}`;
+    const period1 = `${formatTime(h.ouverture)} - ${formatTime(h.fermeture)}`;
+    if (h.ouverture2 && h.fermeture2) {
+      return `${period1} / ${formatTime(h.ouverture2)} - ${formatTime(h.fermeture2)}`;
+    }
+    return period1;
   };
 
   const defaultMapEmbed = "https://www.google.com/maps?q=Route+de+Cirendino+20144+Sainte-Lucie+de+Porto-Vecchio+Corse&output=embed&z=14";

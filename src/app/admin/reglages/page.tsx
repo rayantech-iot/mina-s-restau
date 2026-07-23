@@ -4,13 +4,13 @@ import { useEffect, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
 import { Save, Mail } from "lucide-react";
 
-const defaultHoraires: Record<string, { ouverture: string; fermeture: string } | null> = {
-  lundi: { ouverture: "11:30", fermeture: "14:00" },
-  mardi: { ouverture: "11:30", fermeture: "14:00" },
+const defaultHoraires: Record<string, { ouverture: string; fermeture: string; ouverture2?: string; fermeture2?: string } | null> = {
+  lundi: { ouverture: "11:30", fermeture: "14:00", ouverture2: "18:30", fermeture2: "21:00" },
+  mardi: { ouverture: "11:30", fermeture: "14:00", ouverture2: "18:30", fermeture2: "21:00" },
   mercredi: null,
-  jeudi: { ouverture: "11:30", fermeture: "14:00" },
-  vendredi: { ouverture: "11:30", fermeture: "14:00" },
-  samedi: { ouverture: "11:30", fermeture: "14:00" },
+  jeudi: { ouverture: "11:30", fermeture: "14:00", ouverture2: "18:30", fermeture2: "21:00" },
+  vendredi: { ouverture: "11:30", fermeture: "14:00", ouverture2: "18:30", fermeture2: "21:00" },
+  samedi: { ouverture: "11:30", fermeture: "14:00", ouverture2: "18:30", fermeture2: "21:00" },
   dimanche: null,
 };
 
@@ -94,7 +94,7 @@ export default function AdminReglagesPage() {
     setTimeout(() => setSaved(false), 3000);
   };
 
-  const updateHoraire = (jour: string, field: "ouverture" | "fermeture", value: string) => {
+  const updateHoraire = (jour: string, field: "ouverture" | "fermeture" | "ouverture2" | "fermeture2", value: string) => {
     setHoraires((prev) => ({
       ...prev,
       [jour]: prev[jour]
@@ -106,8 +106,19 @@ export default function AdminReglagesPage() {
   const toggleJour = (jour: string) => {
     setHoraires((prev) => ({
       ...prev,
-      [jour]: prev[jour] ? null : { ouverture: "11:30", fermeture: "14:00" },
+      [jour]: prev[jour] ? null : { ouverture: "11:30", fermeture: "14:00", ouverture2: "", fermeture2: "" },
     }));
+  };
+
+  const togglePeriode2 = (jour: string) => {
+    setHoraires((prev) => {
+      const h = prev[jour];
+      if (!h) return prev;
+      if (h.ouverture2 || h.fermeture2) {
+        return { ...prev, [jour]: { ...h, ouverture2: "", fermeture2: "" } };
+      }
+      return { ...prev, [jour]: { ...h, ouverture2: "18:30", fermeture2: "21:00" } };
+    });
   };
 
   if (loading) {
@@ -172,28 +183,60 @@ export default function AdminReglagesPage() {
 
         <div className="rounded-2xl bg-blanc p-6 shadow-sm">
           <h2 className="font-serif text-xl font-bold text-marine mb-4">Horaires d&apos;ouverture</h2>
+          <p className="text-sm text-texte-light mb-4">
+            Configurez les horaires par periode (ex: midi et soir). Utilisez le bouton &quot;+2e periode&quot; pour ajouter un deuxieme creneau.
+          </p>
           <div className="space-y-3">
             {Object.entries(horaires).map(([jour, h]) => (
-              <div key={jour} className="flex items-center gap-4 rounded-lg bg-creme px-4 py-3">
-                <label className="flex items-center gap-3 min-w-[120px]">
-                  <button type="button" onClick={() => toggleJour(jour)}
-                    className={`h-5 w-9 rounded-full transition-colors ${h ? "bg-success" : "bg-border"}`}>
-                    <span className={`block h-4 w-4 rounded-full bg-blanc shadow transition-transform ${h ? "translate-x-4" : "translate-x-0.5"}`} />
-                  </button>
-                  <span className="capitalize text-sm font-medium text-texte">{jour}</span>
-                </label>
-                {h && (
-                  <div className="flex items-center gap-2 text-sm">
-                    <input type="time" value={h.ouverture}
-                      onChange={(e) => updateHoraire(jour, "ouverture", e.target.value)}
-                      className="rounded border border-border bg-blanc px-2 py-1 text-sm text-texte focus:border-marine outline-none" />
-                    <span className="text-texte-lighter">—</span>
-                    <input type="time" value={h.fermeture}
-                      onChange={(e) => updateHoraire(jour, "fermeture", e.target.value)}
-                      className="rounded border border-border bg-blanc px-2 py-1 text-sm text-texte focus:border-marine outline-none" />
+              <div key={jour} className="rounded-lg bg-creme px-4 py-3">
+                <div className="flex items-center gap-4">
+                  <label className="flex items-center gap-3 min-w-[120px]">
+                    <button type="button" onClick={() => toggleJour(jour)}
+                      className={`h-5 w-9 rounded-full transition-colors ${h ? "bg-success" : "bg-border"}`}>
+                      <span className={`block h-4 w-4 rounded-full bg-blanc shadow transition-transform ${h ? "translate-x-4" : "translate-x-0.5"}`} />
+                    </button>
+                    <span className="capitalize text-sm font-medium text-texte">{jour}</span>
+                  </label>
+                  {h && (
+                    <>
+                      <div className="flex items-center gap-2 text-sm">
+                        <input type="time" value={h.ouverture}
+                          onChange={(e) => updateHoraire(jour, "ouverture", e.target.value)}
+                          className="rounded border border-border bg-blanc px-2 py-1 text-sm text-texte focus:border-marine outline-none" />
+                        <span className="text-texte-lighter">—</span>
+                        <input type="time" value={h.fermeture}
+                          onChange={(e) => updateHoraire(jour, "fermeture", e.target.value)}
+                          className="rounded border border-border bg-blanc px-2 py-1 text-sm text-texte focus:border-marine outline-none" />
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() => togglePeriode2(jour)}
+                        className={`text-xs px-2 py-1 rounded transition-colors ${
+                          h.ouverture2 || h.fermeture2
+                            ? "bg-marine text-creme hover:bg-marine-light"
+                            : "border border-border text-texte-light hover:border-marine hover:text-marine"
+                        }`}
+                      >
+                        {h.ouverture2 || h.fermeture2 ? "2e periode activee" : "+2e periode"}
+                      </button>
+                    </>
+                  )}
+                  {!h && <span className="text-sm text-error font-medium">Ferme</span>}
+                </div>
+                {h && (h.ouverture2 || h.fermeture2) && (
+                  <div className="flex items-center gap-4 mt-2 pt-2 border-t border-border-light">
+                    <div className="min-w-[120px]" />
+                    <div className="flex items-center gap-2 text-sm">
+                      <input type="time" value={h.ouverture2 || ""}
+                        onChange={(e) => updateHoraire(jour, "ouverture2", e.target.value)}
+                        className="rounded border border-border bg-blanc px-2 py-1 text-sm text-texte focus:border-marine outline-none" />
+                      <span className="text-texte-lighter">—</span>
+                      <input type="time" value={h.fermeture2 || ""}
+                        onChange={(e) => updateHoraire(jour, "fermeture2", e.target.value)}
+                        className="rounded border border-border bg-blanc px-2 py-1 text-sm text-texte focus:border-marine outline-none" />
+                    </div>
                   </div>
                 )}
-                {!h && <span className="text-sm text-error font-medium">Fermé</span>}
               </div>
             ))}
           </div>
